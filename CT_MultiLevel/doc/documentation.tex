@@ -1,0 +1,411 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+
+\begin{document}
+
+% The author of the documentation
+\author{Eloisa Bentivegna \textless eloisa.bentivegna@aei.mpg.de\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{CT\_MultiLevel}
+
+% the date your document was last changed, if your document is in CVS,
+% please use:
+%    \date{$ $Date: 2004-01-07 15:12:39 -0500 (Wed, 07 Jan 2004) $ $}
+\date{May 27 2013}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+This thorn implements a multigrid solver for systems of elliptic
+partial differential equations. It uses \texttt{Carpet}'s
+interface to handle loops over the grid hierarchy and pass 
+information between different components. The system of equations
+is passed to the solver via parameters pointing to the external
+grid functions that hold the equation coefficients. 
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+\texttt{CT\_MultiLevel} is a Cactus thorn that implements a multigrid
+solver for elliptic partial differential equations (PDEs). The implementation
+is rather standard, and it also allows for local AMR grids
+(in which case it uses a rudimentary \emph{multilevel} algorithm).
+
+This thorn requires \texttt{Carpet}, which it uses to manage the 
+access to the grid structure (via the \texttt{BEGIN\_*\_LOOP} and 
+\texttt{END\_*\_LOOP} macros) and to pass information between the 
+different levels (via the restriction and prolongation operators).
+
+Structurally, the solver can tackle any type of equation or system
+of equations, their coefficients being passed to \texttt{CT\_MultiLevel} 
+via string parameters holding the names of the corresponding grid 
+function. The thorn comes with a number of test cases which should 
+be easy to customize and extend.
+
+\section{Principle of multigrid}
+Multigrid schemes are designed to solve elliptic equations on a 
+hierarchy of grids, with the goal of speeding up the convergence 
+rate of relaxation algorithms (such as Gauss-Seidel) by eliminating
+different frequency modes of the solution error on different grids.
+It is known that relaxation techniques are very effective at 
+eliminating the high-frequency part of the error; when solving an 
+elliptic PDE on a grid, it is then advantageous to relax it on a 
+coarser grid beforehand and interpolate the result back onto the
+original grid. Complex schemes involving several grid levels, each
+with a different PDE, can be designed to maximize the speed up.
+Please refer to~\cite{Briggs:2000fk} for the details.
+
+\section{Using This Thorn}
+\texttt{CT\_MultiLevel}, along with the rest of the \texttt{Cosmology}
+arrangement, is released under the General Public License, version 2
+and higher. The copyright of this thorn remains with myself.
+
+\subsection{Obtaining This Thorn}
+\texttt{CT\_MultiLevel} is publicly available in COSMOTOOLKIT's git 
+repository:
+\begin{verbatim}
+   git clone git@bitbucket.org:eloisa/cosmotoolkitpub.git 
+\end{verbatim}
+A helper thorn \texttt{CT\_Analytic} is available under the same repository.
+
+\subsection{Basic Usage}
+In order to solve an elliptic PDE with \texttt{CT\_MultiLevel},
+\texttt{CT\_MultiLevel} can be simply compiled in, with the 
+requirement that \texttt{Carpet} is compiled as well. The thorn 
+also inherits from \texttt{boundary} and \texttt{grid} for boundary 
+APIs and coordinate labels.
+
+Currently, the equation is solved in a single schedule call at 
+\texttt{CCTK\_INITIAL}, in \texttt{GLOBAL\_LATE} mode (to ensure
+that necessary objects such as the grid arrays have been populated).
+
+As the equation coefficients will be set by grid functions, a thorn
+allocating and setting these grid functions to the desired values
+has to be included. Another thorn in the \texttt{Cosmology} arrangement,
+\texttt{CT\_Analytic}, serves this purpose. Grid functions of other
+origin are naturally just as good.
+
+Each equation in the system to solve is parametrized as
+follows:
+\begin{eqnarray}
+c_{xx} \partial_{xx} \psi + c_{xy} \partial_{xy} \psi + c_{xz} \partial_{xz} \psi + 
+c_{yy} \partial_{yy} \psi + c_{yz} \partial_{yz} \psi + c_{zz} \partial_{zz} \psi &+& \\
+c_{x} \partial_{x} \psi + c_{y} \partial_{y} \psi + c_{z} \partial_{z} \psi +
+c_{0} \psi^{n_0} + c_{1} \psi^{n_1} + c_{2} \psi^{n_2} + c_{3} \psi^{n_3} + c_4 \psi^{n_4} &=& 0
+\end{eqnarray}
+All the coefficients $c_*$ and the powers $n_*$ can be specified by
+setting the parameters \texttt{*\_gfname[*]} to the desired grid 
+function name. These parameters are arrays to allow for the solution 
+of systems of equations.
+
+The only other parameter which must be set to ensure correct 
+operation is \texttt{CT\_MultiLevel::topMGlevel}, which tells the
+solver which is the finest refinement level that covers the entire
+domain in which the equation is to be solved. All levels below and
+including this will be used in the classical multigrid sense
+(e.g., in a V- or FMG-cycle). The ones above will be treated as
+local AMR boxes, and be solved via a multilevel prescription; 
+presently, this involves simply interpolating the solution from
+the \texttt{topMGlevel} refinement level at the end of the 
+multigrid part and relaxing it progressively, from coarser to 
+finer, on all the local grids. 
+
+Other parameters control the stopping criteria (numbers of 
+relaxation sweeps and residual tolerance), the finite-differencing 
+order used to discretized the equation, the number of equations
+in the system, and whether the solution error should be calculated
+(this obviously requires the exact solution to be known and
+stored in a grid function, its name passed to \texttt{CT\_MultiLevel}
+via the usual parameter mechanism).
+
+Concrete examples on how to set these parameters are provided
+below.
+
+\subsection{Special Behaviour}
+When the equation coefficients cannot be passed in via external
+grid functions (as is the case, for instance, when solving a
+coupled system of PDEs), then one can resort to auxiliary functions,
+which are recalculated after each relaxation sweep. The actual
+algorithm used to populate these coefficient has to be provided
+by the user; some examples are provided under \texttt{src/auxiliaries}.
+These values are stored in \texttt{CT\_MultiLevel}'s \texttt{auxiliaries}
+variable group.
+
+All coefficients, auxiliaries, and other useful grid functions are
+stored in the pointer structure \texttt{coeffptr}, to which the user
+can further append pointers to extra external grid functions, which 
+are not used as PDE coefficients (and thus do not need additional 
+storage space and shouldn't be introduced as auxiliaries), but are 
+still needed by the solver. Examples can be found under 
+\texttt{src/extra}.
+ 
+Finally, if variable resetting is necessary after each relaxation
+step (for instance, when solving linear problems in periodic domains),
+a suitable calculation needs to be provided by the user, similar to
+the examples in \texttt{src/integral}.
+
+\subsection{Interaction With Other Thorns}
+\texttt{CT\_MultiLevel} uses some of \texttt{Carpet}'s macros to
+access different components of a grid hierarchy, and its prolongation
+and restriction operators to pass information between them.
+
+Furthermore, \texttt{CT\_MultiLevel} needs at least one external
+thorn to set the PDE coefficients. The helper thorn \texttt{CT\_Analytic}
+can be used to this purpose, but any set of external grid functions 
+will serve the purpose.
+
+\subsection{Examples}
+The solver is described in~\cite{Bentivegna:2013xna}, along with a number
+of examples. I rediscuss some of those below from the technical
+standpoint, highlighting which parameters need to be set in each case
+and whether other information is required from the user.
+
+\subsection{Poisson's equation}
+Poisson's equation reads:
+\beq
+\Delta \psi + \rho = 0
+\eeq
+where $\rho$ is a known source function and $\psi$ is an unknown
+to solve for. Its Laplacian, $\Delta \psi$, simply represents the
+sum of its diagonal second-order derivatives:
+\beq
+\Delta \psi = \partial_{xx} \psi + \partial_{yy} \psi + \partial_{zz} \psi
+\eeq
+so that \texttt{cxx\_gfname[0]}, \texttt{cyy\_gfname[0]} and \texttt{czz\_gfname[0]}
+all have to be set to one. The source term can be specified freely.
+\texttt{CT\_Analytic} can be used to set all coefficients, e.g. 
+setting the \texttt{CT\_Analytic::free\_data} parameter to \texttt{exact}, 
+where the coefficients of the diagonal second-order derivatives are
+all one, the source term can be set to a linear combination of a
+gaussian, a sine, and a $1/r$ term, and all the other coefficients
+default to zero. To choose a gaussian source term, for instance, one
+can set:
+\begin{verbatim}
+CT_Analytic::free_data             = "exact"
+CT_Analytic::ampG                  = 1
+CT_Analytic::sigma                 = 0.5
+\end{verbatim}
+and then pass the relevant grid functions to \texttt{CT\_MultiLevel}:
+\begin{verbatim}
+CT_MultiLevel::cxx_gfname[0]       = "CT_Analytic::testcxx"
+CT_MultiLevel::cyy_gfname[0]       = "CT_Analytic::testcyy"
+CT_MultiLevel::czz_gfname[0]       = "CT_Analytic::testczz"
+CT_MultiLevel::c0_gfname[0]        = "CT_Analytic::testc0"
+CT_MultiLevel::n0[0]               = 0
+\end{verbatim}
+\texttt{CT\_Analytic} can also be used to set the initial guess for
+the solver:
+\begin{verbatim}
+CT_MultiLevel::inipsi_gfname[0]    = "CT_Analytic::testinipsi"
+\end{verbatim}
+Any coefficient that is not specified explicitly via a parameter 
+will be initialized to zero.
+
+Other parameters can be used to tune the solver's behavior, 
+including the cycling mode through the different levels and the
+stopping criterion. The parameter file \texttt{par/poisson.par}
+provides a concrete example.
+
+\subsection{The Einstein constraint system for a spherical distribution of matter}
+Let's consider Einstein's constraints in the Lichnerowicz-York form
+and in a conformally-flat space, 
+i.e. a coupled system of four PDEs for the four functions $\psi$ and 
+$X_i$:
+\begin{eqnarray}
+\label{eq:CTT}
+ \Delta \psi - \frac{K^2}{12}\,\psi^5 + \frac{1}{8} {A}_{ij} {A}^{ij} \psi^{-7} = - 2 \pi \rho \psi^5 \\
+ \Delta X_i + \partial_i \partial_j X^j - \frac{2}{3} \psi^6 \delta^{ij} \partial_i K = 8 \pi j^i \psi^{10}
+\end{eqnarray} 
+where
+\beq
+A_{ij}=\partial_i X_j + \partial_j X_i + \frac{2}{3} \; \delta_{ij} \partial_k X^k
+\eeq
+and $K$, $\rho$ and $j^i$ are freely specifiable functions.
+
+Due to conformal flatness, again $\Delta = \partial_{xx} + \partial_{yy} 
++ \partial_{zz}$. However, in this case we have the additional
+complication that the coefficient of the $\psi^{-7}$ term in the
+first equation depends on $X^i$, and therefore has to be updated
+during the solution process. This is accomplished by storing this 
+coefficient in an auxiliary function, filled by the function
+\texttt{CT\_SetAuxiliaries} initially and after each Gauss-Seidel 
+iteration. The recipe to fill this grid function is contained in
+\texttt{src/auxiliaries/Lump.cc}.
+
+The parameter specification for this case is then:
+\begin{verbatim}
+CT_Analytic::free_data             = "Lump"
+CT_Analytic::Kc                    = -0.1
+CT_Analytic::ampG                  = 1
+CT_Analytic::ampC                  = 1
+CT_Analytic::ampV                  = 0.1
+CT_Analytic::sigma                 = 0.2
+CT_Analytic::vecA                  = 0.6
+\end{verbatim}
+which specifies the equation coefficients and the free data 
+$K$, $\rho$ and $X^i$, and:
+\begin{verbatim}
+CT_MultiLevel::inipsi_gfname[0]    = "CT_Analytic::testinipsi"
+CT_MultiLevel::cxx_gfname[0]       = "CT_Analytic::testcxx"
+CT_MultiLevel::cyy_gfname[0]       = "CT_Analytic::testcyy"
+CT_MultiLevel::czz_gfname[0]       = "CT_Analytic::testczz"
+CT_MultiLevel::n0[0]               = 5
+CT_MultiLevel::c0_gfname[0]        = "CT_Analytic::testc0"
+CT_MultiLevel::n1[0]               = 0
+CT_MultiLevel::c1_gfname[0]        = "CT_Analytic::testc1"
+CT_MultiLevel::n2[0]               = -7
+CT_MultiLevel::c2_gfname[0]        = "CT_MultiLevel::ct_auxiliary[0]"
+
+CT_MultiLevel::inipsi_gfname[1]    = "CT_Analytic::testinixx"
+CT_MultiLevel::cxx_gfname[1]       = "CT_Analytic::testcxx"
+CT_MultiLevel::cyy_gfname[1]       = "CT_Analytic::testcyy"
+CT_MultiLevel::czz_gfname[1]       = "CT_Analytic::testczz"
+CT_MultiLevel::n0[1]               = 0
+CT_MultiLevel::c0_gfname[1]        = "CT_Analytic::testc2"
+CT_MultiLevel::n1[1]               = 0
+CT_MultiLevel::c1_gfname[1]        = "CT_MultiLevel::ct_auxiliary[1]"
+
+CT_MultiLevel::inipsi_gfname[2]    = "CT_Analytic::testinixy"
+CT_MultiLevel::cxx_gfname[2]       = "CT_Analytic::testcxx"
+CT_MultiLevel::cyy_gfname[2]       = "CT_Analytic::testcyy"
+CT_MultiLevel::czz_gfname[2]       = "CT_Analytic::testczz"
+CT_MultiLevel::n0[2]               = 0
+CT_MultiLevel::c0_gfname[2]        = "CT_Analytic::testc3"
+CT_MultiLevel::n1[2]               = 0
+CT_MultiLevel::c1_gfname[2]        = "CT_MultiLevel::ct_auxiliary[2]"
+
+CT_MultiLevel::inipsi_gfname[3]    = "CT_Analytic::testinixz"
+CT_MultiLevel::cxx_gfname[3]       = "CT_Analytic::testcxx"
+CT_MultiLevel::cyy_gfname[3]       = "CT_Analytic::testcyy"
+CT_MultiLevel::czz_gfname[3]       = "CT_Analytic::testczz"
+CT_MultiLevel::n0[3]               = 0
+CT_MultiLevel::c0_gfname[3]        = "CT_Analytic::testc4"
+CT_MultiLevel::n1[3]               = 0
+CT_MultiLevel::c1_gfname[3]        = "CT_MultiLevel::ct_auxiliary[3]"
+\end{verbatim}
+which informs \texttt{CT\_MultiLevel} on the grid functions holding
+the coefficients and on the existence of auxiliary functions.
+
+Further parameters control other aspects of the solution, and can be
+found in \texttt{par/constraints\_spherical.par}. In particular, the
+parameter \texttt{CT\_MultiLevel::number\_of\_equations} has to be set
+explicitly to four to accomodate the full system of equations.
+
+\section{History}
+The development of this solver has been financed by the European
+Commission's $7^{\rm th}$ Framework through a Marie Curie IR Grant 
+(PIRG05-GA-2009-249290, COSMOTOOLKIT). Please direct any feedback, 
+as well as requests for support, to 
+\href{mailto:eloisa.bentivegna@aei.mpg.de}{eloisa.bentivegna@aei.mpg.de}.
+
+Lars Andersson, Miko\l{}aj Korzy\'nski, Ian Hinder, Bruno Mundim, 
+Oliver Rinne and Erik Schnetter have also contributed insight and
+suggestions that have partly offset my bad judgement on many issues.
+All remaining errors and bugs are naturally my own responsibility. 
+
+\begin{thebibliography}{9}
+
+\bibitem{Briggs:2000fk}
+Briggs W, Henson V and McCormick S 2000 {\em A Multigrid Tutorial\/}
+  Miscellaneous Bks (Society for Industrial and Applied Mathematics) ISBN
+  9780898714623
+
+\bibitem{Bentivegna:2013xna}
+Bentivegna E 2013 \textit{Solving the Einstein constraints in periodic spaces 
+with a multigrid approach} (\textit{Preprint} 
+\href{http://arxiv.org/abs/arXiv:1305.5576}{gr-qc/1305.5576})
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

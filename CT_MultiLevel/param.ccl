@@ -1,0 +1,329 @@
+#
+
+shares: admbase
+EXTENDS KEYWORD initial_data
+{
+  "CT_MultiLevel" :: "Initial data from this solver"
+}
+
+private:
+# Algorithm parameters
+KEYWORD mode "Which equation should we solve?"
+{
+  "generic" :: "Generic elliptic operator, to be defined via the coefficients"
+  "constraints" :: "The GR constraints"
+} "generic"
+
+KEYWORD model "Model used to populate the auxiliary functions"
+{
+  "Bowen-York"                       :: "Bowen-York extrinsic curvature for multiple punctures"
+  "Expanding BH lattice"             :: "An expanding black-hole lattice"
+  "Lump"                             :: "Generic compact source in Tmunu"
+  "Inhomogeneous Helmholtz"          :: "Inhomogeneous Helmholtz equation"
+  "None"                             :: "No auxiliaries needed"
+} "None"
+
+KEYWORD cycle_type "How should be cycle over the refinement levels?"
+{
+  "V cycle"   :: "A V cycle"
+  "FMG cycle" :: "A FMG cycle"
+} "V cycle"
+
+KEYWORD verbose "Output debugging information?"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+KEYWORD veryverbose "Output more debugging information?"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+KEYWORD output_norms "Output the norms of psi and residual, and those of their errors?"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+KEYWORD compare_to_exact "Output a file with the difference between the solution at each iteration and the exact solution, if known"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+KEYWORD output_walk "Output a file with the parameter-space walk followed by the algorithm?"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+KEYWORD fill_ADM "Should the equation solution be used to fill the ADM variables?"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+KEYWORD boundary_conditions "Which boundary conditions to apply to psi"
+{
+  "Robin"        :: "Robin"
+  "TwoPunctures" :: "Dirichlet BCs from TwoPunctures"
+  "none"         :: "This thorn will apply no boundary conditions"
+} "none"
+
+CCTK_STRING exact_solution_gfname[10] "Grid function holding the exact solution" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero" 
+
+CCTK_STRING exact_laplacian_gfname[10] "Grid function holding the exact laplacian" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero" 
+
+CCTK_REAL exact_offset "Offset between exact solution and grid function pointed by exact_solution_gfname" STEERABLE=ALWAYS
+{
+    *:*  :: "Any real number"
+} 0.0
+
+KEYWORD disable[10] "Should this equation actually be solved?"
+{
+  "no" :: "no"
+  "yes" :: "yes"
+} "no"
+
+CCTK_INT fd_order "Order of FD"
+{
+  2:4:2   :: "Order of differencing"
+} 2
+
+CCTK_INT number_of_equations "How many equations are to be solved concurrently?"
+{
+  1:10    :: "A positive integer smaller than or equal to 10"
+} 1
+
+CCTK_INT number_of_auxiliaries "How many auxiliary functions do we need?"
+{
+  0:      :: "A non-negative integer"
+} 0
+
+CCTK_INT nrelsteps_up "How many times should we relax each level inside the upward leg of a cycle?"
+{
+  0:      :: "Any non-negative integer"
+} 2
+
+CCTK_INT nrelsteps_down "How many times should we relax each level inside the downward leg of a cycle?"
+{
+  0:      :: "Any non-negative integer"
+} 2
+
+CCTK_INT nrelsteps_bottom "How many times should we relax each level at the bottom of a cycle?"
+{
+  0:      :: "Any non-negative integer"
+} 2
+
+CCTK_INT nrelsteps_top "How many times should we relax each level at the top of a cycle?"
+{
+  0:      :: "Any non-negative integer"
+} 2
+
+CCTK_INT integral_refinement "How much to refine the grid via interpolation before calculating integrals"
+{
+  1:*   :: "Any integer greater than zero"
+} 1
+
+CCTK_REAL tol "Maximum residual tolerated"
+{
+  0:* ::  "Any non-negative real"
+} 1e-06
+
+CCTK_REAL eps "Regularization factor at the punctures"
+{
+  0:* ::  "Any non-negative real"
+} 1e-06
+
+CCTK_REAL omega "Overrelaxation factor"
+{
+  0:2 ::  "Real larger than zero and smaller than 2"
+} 1
+
+KEYWORD reset_psi "Reset psi after each relaxation step? How?"
+{
+  "no"                    :: "Do not reset"
+  "to value"              :: "Reset to the value specified by reset_value"
+  "through integrability" :: "Reset so that the integrability condition is satisfied"
+} "no"
+
+CCTK_INT reset_every "How often should we reset psi?"
+{
+  1:*   :: "Any positive integer"
+} 1
+
+CCTK_REAL reset_value[10] "Value to reset psi to"
+{
+  *:*   :: "Any real number"
+} 0
+
+CCTK_REAL reset_x "x-coordinate of point of reference for variable resetting"
+{
+  : ::  "Any real number (contained in the domain!)"
+} 0
+
+CCTK_REAL reset_y "y-coordinate of point of reference for variable resetting"
+{
+  : ::  "Any real number (contained in the domain!)"
+} 0
+
+CCTK_REAL reset_z "z-coordinate of point of reference for variable resetting"
+{
+  : ::  "Any real number (contained in the domain!)"
+} 0
+
+CCTK_INT enforce_int "Enforce the integral compatibility condition?"
+{
+  0:1:1 :: "True or false"
+} 0
+
+CCTK_INT topMGlevel "Finest level that covers the entire domain"
+{
+  0:      :: "Any non-negative integer (< Carpet::reflevels!)"
+} 0
+
+# Equation coefficients
+CCTK_INT n0[10] "Exponent of a power-law term"
+{
+  : ::  "Any integer"
+} 0
+
+CCTK_INT n1[10] "Exponent of a power-law term"
+{
+  : ::  "Any integer"
+} 0
+
+CCTK_INT n2[10] "Exponent of a power-law term"
+{
+  : ::  "Any integer"
+} 0
+
+CCTK_INT n3[10] "Exponent of a power-law term"
+{
+  : ::  "Any integer"
+} 0
+
+CCTK_INT n4[10] "Exponent of a power-law term"
+{
+  : ::  "Any integer"
+} 0
+
+CCTK_STRING inipsi_gfname[10] "Use this grid function to set the initial guess for psi" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cxx_gfname[10] "Use this grid function to set the cxx coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cxy_gfname[10] "Use this grid function to set the cxy coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cxz_gfname[10] "Use this grid function to set the cxz coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cyy_gfname[10] "Use this grid function to set the cyy coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cyz_gfname[10] "Use this grid function to set the cyz coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING czz_gfname[10] "Use this grid function to set the czz coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cx_gfname[10] "Use this grid function to set the cx coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cy_gfname[10] "Use this grid function to set the cy coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING cz_gfname[10] "Use this grid function to set the cz coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING c0_gfname[10] "Use this grid function to set the c0 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING c1_gfname[10] "Use this grid function to set the c1 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING c2_gfname[10] "Use this grid function to set the c2 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING c3_gfname[10] "Use this grid function to set the c3 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING c4_gfname[10] "Use this grid function to set the c4 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING a0_gfname[10] "Use this grid function to set the a0 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING a1_gfname[10] "Use this grid function to set the a1 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING a2_gfname[10] "Use this grid function to set the a2 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING a3_gfname[10] "Use this grid function to set the a3 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+CCTK_STRING a4_gfname[10] "Use this grid function to set the a4 coefficient" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
+
+KEYWORD fill_Aij "Where does the final Aij come from?"
+{
+  "Solver"       :: "Aij is solved for as well"
+  "Analytic Xi"  :: "Aij comes from differentiating an analytic Xi"
+  "Analytic Aij" :: "Aij comes from an exact solution"
+} "Analytic Aij"
+
+CCTK_STRING other_gfname[10] "Other gf names needed by solver" STEERABLE=ALWAYS
+{
+    ".*" :: "Any valid grid function"
+} "CT_MultiLevel::ct_zero"
