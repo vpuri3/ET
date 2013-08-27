@@ -173,7 +173,7 @@ CT_Analytic::Ke			   = -0.1
 CT_Analytic::ampG                  = 1
 CT_Analytic::ampC                  = 1
 CT_Analytic::ampI                  = 0.5
-CT_Analytic::ampV                  = 0.1
+CT_Analytic::ampVG                 = 0.1
 CT_Analytic::sigma                 = 0.2
 CT_Analytic::vecA                  = 0.6
 
