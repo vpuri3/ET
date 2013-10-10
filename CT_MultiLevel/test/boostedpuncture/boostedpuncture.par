@@ -69,6 +69,7 @@ Carpet::convergence_level = 0
 
 Carpet::poison_new_timelevels = yes
 CarpetLib::poison_new_memory  = yes
+CarpetLib::poison_value       = 250
 
 Carpet::output_timers_every      = 0
 
@@ -112,7 +113,7 @@ CT_MultiLevel::tol                 = 1e-12
 CT_MultiLevel::omega               = 1
 CT_MultiLevel::fd_order            = 4
 CT_MultiLevel::output_norms        = "yes"
-CT_MultiLevel::output_walk         = "yes"
+CT_MultiLevel::output_walk         = "no"
 CT_MultiLevel::nrelsteps_down      = 50
 CT_MultiLevel::nrelsteps_up        = 10
 CT_MultiLevel::nrelsteps_bottom    = 500
@@ -200,8 +201,6 @@ IOASCII::out1D_vars  = "
 	CT_MultiLevel::err
 	CT_MultiLevel::auxiliaries
 	CT_Analytic::testinipsi
-	CT_Analytic::testc1
-	CT_Analytic::testc0
 	CT_Analytic::epsi
 	CT_Analytic::testa0
 	ML_BSSN::ml_ham
@@ -220,7 +219,6 @@ IOHDF5::out_vars  = "
 	CT_MultiLevel::err
 	CT_MultiLevel::residual
 	CT_Analytic::testW
-	CT_Analytic::testc0
 	ML_BSSN::ml_ham
 "
 
