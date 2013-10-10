@@ -1,1 +1,7 @@
 NPROCS 2
+
+TEST constraints_spherical
+{
+  ABSTOL 1e-05
+  RELTOL 1e+06
+}

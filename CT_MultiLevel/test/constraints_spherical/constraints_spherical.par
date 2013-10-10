@@ -64,6 +64,7 @@ Carpet::prolongation_order_time  = 2
 
 Carpet::poison_new_timelevels = "yes"
 CarpetLib::poison_new_memory  = "yes"
+CarpetLib::poison_value       = 250
 
 CarpetLib::max_allowed_memory_MB = 8192
 
@@ -109,9 +110,9 @@ CT_MultiLevel::output_norms        = "yes"
 CT_MultiLevel::output_walk         = "yes"
 CT_MultiLevel::fill_ADM            = "no"
 CT_MultiLevel::nrelsteps_down      = 50
-CT_MultiLevel::nrelsteps_up        = 10
+CT_MultiLevel::nrelsteps_up        = 50
 CT_MultiLevel::nrelsteps_bottom    = 50
-CT_MultiLevel::nrelsteps_top       = 10
+CT_MultiLevel::nrelsteps_top       = 50
 CT_MultiLevel::topMGlevel          = 2
 CT_MultiLevel::number_of_equations = 4
 CT_MultiLevel::number_of_auxiliaries = 4
@@ -170,7 +171,7 @@ CT_Analytic::Ke			   = -0.1
 CT_Analytic::ampG                  = 1
 CT_Analytic::ampC                  = 1
 CT_Analytic::ampI                  = 0.5
-CT_Analytic::ampV                  = 0.1
+CT_Analytic::ampVG                 = 0.1
 CT_Analytic::sigma                 = 0.2
 CT_Analytic::vecA                  = 0.6
 
@@ -200,8 +201,8 @@ ActiveThorns = "CarpetIOASCII"
 
 IOASCII::one_file_per_group = yes
 
-IOASCII::output_symmetry_points = yes
-IOASCII::out3D_ghosts           = yes
+IOASCII::output_symmetry_points = no
+IOASCII::out3D_ghosts           = no
 IOASCII::output_all_timelevels  = yes
 
 IOASCII::out1D_criterion = "divisor"
