@@ -71,7 +71,7 @@ extern "C" void CT_RelaxPsi(CCTK_ARGUMENTS,
       CT_UpdateBoundaries(CCTK_PASS_CTOC, "CT_MultiLevel::psi");
 
       if (CCTK_Equals(compare_to_exact, "yes")) CT_CompareToExact(CCTK_PASS_CTOC, 0);
-      if (output_walk)
+      if (CCTK_Equals(output_walk,"yes"))
       {
         CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0);
         CT_OutputWalk(CCTK_PASS_CTOC);

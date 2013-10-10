@@ -81,7 +81,7 @@ extern "C" void CT_RelaxError(CCTK_ARGUMENTS,
 //      CT_InitializeCoefficients(CCTK_PASS_CTOC);
 
       if (CCTK_Equals(compare_to_exact, "yes")) CT_CompareToExact(CCTK_PASS_CTOC, 1);
-      if (output_walk)
+      if (CCTK_Equals(output_walk,"yes"))
       {
         CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0);
         CT_OutputWalk(CCTK_PASS_CTOC);
