@@ -70,6 +70,7 @@ Carpet::convergence_level = 0
 
 Carpet::poison_new_timelevels = yes
 CarpetLib::poison_new_memory  = yes
+#CarpetLib::poison_value       = 250
 
 Carpet::output_timers_every      = 0
 
@@ -165,8 +166,8 @@ ActiveThorns = "CarpetIOASCII"
 
 IOASCII::one_file_per_group = yes
 
-IOASCII::output_symmetry_points = yes
-IOASCII::out3D_ghosts           = yes
+IOASCII::output_symmetry_points = no
+IOASCII::out3D_ghosts           = no
 
 IOASCII::out0D_criterion = "divisor"
 IOASCII::out0D_every = 0
@@ -181,9 +182,7 @@ IOASCII::out1D_vars  = "
 	CT_MultiLevel::coeffs
 	CT_MultiLevel::residual
 	CT_MultiLevel::err
-	CT_MultiLevel::copies
 	CT_Analytic::testinipsi
-	CT_Analytic::testc1
 	CT_Analytic::testc0
 	CT_Analytic::epsi
 "
