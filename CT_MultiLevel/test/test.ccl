@@ -1,7 +1,19 @@
 NPROCS 2
 
+TEST boostedpuncture
+{
+  ABSTOL 1e-13 ham 
+  RELTOL 1e-08 ham
+}
+
 TEST constraints_spherical
 {
   ABSTOL 1e-05
   RELTOL 1e+06
+}
+
+TEST poisson
+{
+  RELTOL 1e-05 err
+  RELTOL 1e-05 residual
 }
