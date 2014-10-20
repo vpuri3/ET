@@ -36,7 +36,14 @@ extern "C" void CT_UpdateBoundaries(CCTK_ARGUMENTS, const char *varname)
     if (ierr < 0)
       CCTK_VWarn(0, __LINE__, __FILE__, "Failed to register boundary conditions for %s.", varname);
 
-    CCTK_ScheduleTraverse("ApplyBCs", cctkGH, NULL);
+    BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
+      BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
+        if (CT_ProcessOwnsData())
+        {
+          CCTK_ScheduleTraverse("ApplyBCs", cctkGH, NULL);
+        }
+      } END_COMPONENT_LOOP;
+    } END_MAP_LOOP;
   }
 
   return;
