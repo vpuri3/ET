@@ -9,7 +9,7 @@
 
 #include "CT_MultiLevel.hh"
 
-extern "C" void CT_CalcPsiResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT output)
+extern "C" void CT_CalcPsiResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT output, CCTK_REAL *norm)
 {
   DECLARE_CCTK_PARAMETERS;
 
@@ -108,10 +108,10 @@ extern "C" void CT_CalcPsiResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT outpu
       } END_COMPONENT_LOOP;
     } END_MAP_LOOP;
 
-    CCTK_REAL norm;
-    CT_Norm(CCTK_PASS_CTOC, "CT_MultiLevel::ct_residual[0]", &norm, nequation);
+    //CCTK_REAL norm;
+    CT_Norm(CCTK_PASS_CTOC, "CT_MultiLevel::ct_residual[0]", norm, nequation);
 
-    if (output) CCTK_VInfo(CCTK_THORNSTRING, " * Equation #%d: %d iterations, norm of final residual = %1.10e", nequation, step, norm);
+    if (output) CCTK_VInfo(CCTK_THORNSTRING, " * Equation #%d: %d iterations, norm of final residual = %1.10e", nequation, step, *norm);
 
   } // for
   return;

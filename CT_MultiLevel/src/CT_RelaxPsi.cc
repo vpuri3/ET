@@ -56,7 +56,8 @@ extern "C" void CT_RelaxPsi(CCTK_ARGUMENTS,
     // used as a stopping criterion, but rather the norm of the residual.
     while (norm > tol && step < nsteps)
     {
-      CT_SolvePsiEquation(CCTK_PASS_CTOC, &norm, &step);
+      double tmp;
+      CT_SolvePsiEquation(CCTK_PASS_CTOC, &tmp, &step);
 
       if (rset_psi > 0 && step%reset_every == 0)
       {
@@ -73,15 +74,16 @@ extern "C" void CT_RelaxPsi(CCTK_ARGUMENTS,
       if (CCTK_Equals(compare_to_exact, "yes")) CT_CompareToExact(CCTK_PASS_CTOC, 0);
       if (CCTK_Equals(output_walk,"yes"))
       {
-        CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0);
+        CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0, &tmp);
         CT_OutputWalk(CCTK_PASS_CTOC);
       }
+      CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0, &norm);
     }
 
     for (int nequation=0; nequation < number_of_equations; nequation++)
       CT_Copy(CCTK_PASS_CTOC, "CT_MultiLevel::ct_psi[0]", "CT_MultiLevel::ct_psi_copy[0]", nequation);
 
-    CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 1);
+    CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 1, &norm);
     CT_UpdateBoundaries(CCTK_PASS_CTOC, "CT_MultiLevel::residual");
     CT_UpdateBoundaries(CCTK_PASS_CTOC, "CT_MultiLevel::coeffs");
     for (int nequation=0; nequation < number_of_equations; nequation++)

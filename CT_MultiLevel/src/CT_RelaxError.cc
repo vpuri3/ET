@@ -83,15 +83,17 @@ extern "C" void CT_RelaxError(CCTK_ARGUMENTS,
       if (CCTK_Equals(compare_to_exact, "yes")) CT_CompareToExact(CCTK_PASS_CTOC, 1);
       if (CCTK_Equals(output_walk,"yes"))
       {
-        CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0);
+        //CT_CalcPsiResidual(CCTK_PASS_CTOC, step, 0);
         CT_OutputWalk(CCTK_PASS_CTOC);
       }
+      CT_CalcErrResidual(CCTK_PASS_CTOC, step, 0, &norm);
     }
 
     for (int nequation=0; nequation < number_of_equations; nequation++)
       CT_Copy(CCTK_PASS_CTOC, "CT_MultiLevel::ct_err[0]", "CT_MultiLevel::ct_err_copy[0]", nequation);
-
-    CT_CalcErrResidual(CCTK_PASS_CTOC, step);
+    
+    double tmp;
+    CT_CalcErrResidual(CCTK_PASS_CTOC, step, 1, &tmp);
     CT_UpdateBoundaries(CCTK_PASS_CTOC, "CT_MultiLevel::residual");
     CT_UpdateBoundaries(CCTK_PASS_CTOC, "CT_MultiLevel::coeffs");
     for (int nequation=0; nequation < number_of_equations; nequation++)

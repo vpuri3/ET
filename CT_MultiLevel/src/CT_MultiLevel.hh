@@ -14,8 +14,8 @@ extern "C" void CT_InitializeCoefficients(int sindex, int nequation, struct coef
 extern "C" void CT_InitializeConstants(CCTK_ARGUMENTS);
 extern "C" void CT_SolvePsiEquation(CCTK_ARGUMENTS, CCTK_REAL *norm, CCTK_INT *step);
 extern "C" void CT_SolveErrorEquation(CCTK_ARGUMENTS, CCTK_REAL *norm, CCTK_INT *step);
-extern "C" void CT_CalcPsiResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT output);
-extern "C" void CT_CalcErrResidual(CCTK_ARGUMENTS, CCTK_INT step);
+extern "C" void CT_CalcPsiResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT output, CCTK_REAL *norm);
+extern "C" void CT_CalcErrResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT output, CCTK_REAL *norm);
 extern "C" void CT_CompareToExact(CCTK_ARGUMENTS, CCTK_INT outdated_psi);
 extern "C" void CT_AddErrorToPsi(CCTK_ARGUMENTS);
 extern "C" void CT_RestoreError(CCTK_ARGUMENTS);
