@@ -144,6 +144,8 @@ CT_Analytic::ampC                  = 1
 CT_Analytic::massa                 = 1
 CT_Analytic::Pax                   = 1
 
+CT_Analytic::other_timelevels      = 3
+
 ADMBase::metric_timelevels = 3
 ADMBase::lapse_timelevels = 3
 ADMBase::shift_timelevels = 3
