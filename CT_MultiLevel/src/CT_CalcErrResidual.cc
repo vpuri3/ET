@@ -13,6 +13,9 @@ extern "C" void CT_CalcErrResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT outpu
 {
   DECLARE_CCTK_PARAMETERS;
 
+  CCTK_REAL eqnnorm;
+  *norm = 0;
+
   for (int nequation=0; nequation < number_of_equations; nequation++)
   {
     BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
@@ -110,10 +113,10 @@ extern "C" void CT_CalcErrResidual(CCTK_ARGUMENTS, CCTK_INT step, CCTK_INT outpu
       } END_COMPONENT_LOOP;
     } END_MAP_LOOP;
 
-    //CCTK_REAL norm;
-    CT_Norm(CCTK_PASS_CTOC, "CT_MultiLevel::ct_residual[0]", norm, nequation);
+    CT_Norm(CCTK_PASS_CTOC, "CT_MultiLevel::ct_residual[0]", &eqnnorm, nequation);
 
-    if (output) CCTK_VInfo(CCTK_THORNSTRING, " * Equation #%d: %d iterations, norm of final residual = %1.10e", nequation, step, *norm);
+    if (output) CCTK_VInfo(CCTK_THORNSTRING, " * Equation #%d: %d iterations, norm of final residual = %1.10e", nequation, step, eqnnorm);
+    if (eqnnorm > *norm) *norm = eqnnorm;
   } // for
 
   return;
