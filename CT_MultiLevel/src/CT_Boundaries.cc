@@ -36,9 +36,6 @@ extern "C" void CT_Boundaries(CCTK_ARGUMENTS, const char *varname)
         GetBoundarySizesAndTypes(cctkGH, 6, bndsize, is_ghostbnd, is_symbnd, is_physbnd);
         CCTK_INT ivertex = CCTK_GFINDEX3D(cctkGH,cctk_lsh[0]-bndsize[1]-1,cctk_lsh[1]-bndsize[3]-1,cctk_lsh[2]-bndsize[5]-1);
 
-        //Insert a check somewhere that TwoPunctures is active and puncture_u has storage
-        CCTK_REAL *tpu = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, 0, "TwoPunctures::puncture_u");
-
         for (int ivar=ivari; ivar<ivarf; ivar++)
         {
           CCTK_REAL *pvar = (CCTK_REAL *) CCTK_VarDataPtrI(cctkGH, 0, ivar);
