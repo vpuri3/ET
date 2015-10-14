@@ -79,7 +79,6 @@ CarpetRegrid2::radius_1[2]  = 1
 
 #################################
 ActiveThorns = "AEILocalInterp"
-ActiveThorns = "BLAS LAPACK"
 ActiveThorns = "Fortran"
 ActiveThorns = "GenericFD"
 ActiveThorns = "HDF5"
