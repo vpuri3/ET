@@ -204,7 +204,8 @@ IOASCII::out1D_vars  = "
 	CT_Analytic::testinipsi
 	CT_Analytic::epsi
 	CT_Analytic::testa0
-	ML_BSSN::ml_ham
+	ADMBase::metric
+	ADMBase::curv
 "
 
 #################################
@@ -220,7 +221,6 @@ IOHDF5::out_vars  = "
 	CT_MultiLevel::err
 	CT_MultiLevel::residual
 	CT_Analytic::testW
-	ML_BSSN::ml_ham
 "
 
 IOHDF5::checkpoint          = "no"

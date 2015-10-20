@@ -86,7 +86,6 @@ CarpetRegrid2::radius_1[2]  = 16
 
 #################################
 ActiveThorns = "AEILocalInterp"
-ActiveThorns = "BLAS LAPACK"
 ActiveThorns = "Fortran"
 ActiveThorns = "GenericFD"
 ActiveThorns = "HDF5"
@@ -143,6 +142,8 @@ CT_Analytic::ampI                  = 1
 CT_Analytic::ampC                  = 1
 CT_Analytic::massa                 = 1
 CT_Analytic::Pax                   = 1
+
+CT_Analytic::other_timelevels      = 3
 
 ADMBase::metric_timelevels = 3
 ADMBase::lapse_timelevels = 3
@@ -203,7 +204,8 @@ IOASCII::out1D_vars  = "
 	CT_Analytic::testinipsi
 	CT_Analytic::epsi
 	CT_Analytic::testa0
-	ML_BSSN::ml_ham
+	ADMBase::metric
+	ADMBase::curv
 "
 
 #################################
@@ -219,7 +221,6 @@ IOHDF5::out_vars  = "
 	CT_MultiLevel::err
 	CT_MultiLevel::residual
 	CT_Analytic::testW
-	ML_BSSN::ml_ham
 "
 
 IOHDF5::checkpoint          = "no"
