@@ -82,13 +82,12 @@ ActiveThorns = "CarpetRegrid2"
 
 CarpetRegrid2::num_centres  = 1
 CarpetRegrid2::num_levels_1 = 4
-CarpetRegrid2::radius_1[1]  = 5
-CarpetRegrid2::radius_1[2]  = 5
-CarpetRegrid2::radius_1[3]  = 5
+CarpetRegrid2::radius_1[1]  = 1
+CarpetRegrid2::radius_1[2]  = 1
+CarpetRegrid2::radius_1[3]  = 1
 
 #################################
 ActiveThorns = "AEILocalInterp"
-ActiveThorns = "BLAS LAPACK"
 ActiveThorns = "Fortran"
 ActiveThorns = "GenericFD"
 ActiveThorns = "HDF5"
@@ -133,8 +132,13 @@ CT_MultiLevel::czz_gfname[0]       = "CT_Analytic::testczz"
 CT_MultiLevel::c0_gfname[0]        = "CT_Analytic::testc0"
 
 CT_Analytic::ampG                  = 1
-CT_Analytic::sigma                 = 0.5
+CT_Analytic::amp[0]                = 1
+CT_Analytic::sigmax[0]             = 0.5
+CT_Analytic::sigmay[0]             = 0.5
+CT_Analytic::sigmaz[0]             = 0.5
 CT_Analytic::free_data             = "exact"
+
+CT_Analytic::other_timelevels      = 3
 
 #################################
 ActiveThorns = "CarpetIOBasic"

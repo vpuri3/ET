@@ -82,9 +82,9 @@ ActiveThorns = "CarpetRegrid2"
 
 CarpetRegrid2::num_centres  = 1
 CarpetRegrid2::num_levels_1 = 4
-CarpetRegrid2::radius_1[1]  = 5
-CarpetRegrid2::radius_1[2]  = 5
-CarpetRegrid2::radius_1[3]  = 5
+CarpetRegrid2::radius_1[1]  = 1
+CarpetRegrid2::radius_1[2]  = 1
+CarpetRegrid2::radius_1[3]  = 1
 
 #################################
 ActiveThorns = "AEILocalInterp"
