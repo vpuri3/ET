@@ -157,6 +157,7 @@ ActiveThorns = "CarpetIOScalar"
 #################################
 
 IO::out_dir = $parfile
+IO::out_fileinfo = "none"
 
 IOScalar::one_file_per_group = yes
 

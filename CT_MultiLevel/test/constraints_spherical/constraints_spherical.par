@@ -190,6 +190,7 @@ IOBasic::outInfo_vars       = "
 "
 
 IO::out_dir = $parfile
+IO::out_fileinfo = "none"
 
 #################################
 ActiveThorns = "CarpetIOScalar"
