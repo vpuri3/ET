@@ -70,6 +70,7 @@ extern "C" void CT_InitializeADM(CCTK_ARGUMENTS)
             CCTK_REAL *admkzz = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ADMBase::kzz");
 
             CCTK_REAL *trK = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, 0, "CT_Analytic::testK");
+            CCTK_REAL *a0  = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, 0, "CT_Analytic::testa0");
 
             LC_LOOP3 (EL_INM,
                       i, j, k, 0, 0, 0, cctk_lsh[0], cctk_lsh[1], cctk_lsh[2], 
@@ -77,12 +78,12 @@ extern "C" void CT_InitializeADM(CCTK_ARGUMENTS)
             {
               int sindex = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
-              admgxx[sindex] = pow(ct_psi[sindex]+ct_a0[sindex], 4.0);
+              admgxx[sindex] = pow(ct_psi[sindex]+a0[sindex], 4.0);
               admgxy[sindex] = 0;
               admgxz[sindex] = 0;
-              admgyy[sindex] = pow(ct_psi[sindex]+ct_a0[sindex], 4.0);
+              admgyy[sindex] = pow(ct_psi[sindex]+a0[sindex], 4.0);
               admgyz[sindex] = 0;
-              admgzz[sindex] = pow(ct_psi[sindex]+ct_a0[sindex], 4.0);
+              admgzz[sindex] = pow(ct_psi[sindex]+a0[sindex], 4.0);
             } LC_ENDLOOP3 (EL_INM);
              
             if (CCTK_Equals(fill_Aij, "Analytic Aij"))
@@ -107,12 +108,12 @@ extern "C" void CT_InitializeADM(CCTK_ARGUMENTS)
 	        CCTK_REAL Ayz = AyzE[sindex];
 	        CCTK_REAL Azz = AzzE[sindex];
 
-  	        admkxx[sindex] = trK[sindex] * admgxx[sindex] / 3.0 + Axx * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-  	        admkxy[sindex] = Axy * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkxz[sindex] = Axz * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkyy[sindex] = trK[sindex] * admgyy[sindex] / 3.0 + Ayy * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkyz[sindex] = Ayz * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkzz[sindex] = trK[sindex] * admgzz[sindex] / 3.0 + Azz * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
+  	        admkxx[sindex] = trK[sindex] * admgxx[sindex] / 3.0 + Axx * pow(ct_psi[sindex]+a0[sindex], -2.0);
+  	        admkxy[sindex] = Axy * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkxz[sindex] = Axz * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkyy[sindex] = trK[sindex] * admgyy[sindex] / 3.0 + Ayy * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkyz[sindex] = Ayz * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkzz[sindex] = trK[sindex] * admgzz[sindex] / 3.0 + Azz * pow(ct_psi[sindex]+a0[sindex], -2.0);
               } LC_ENDLOOP3 (EL_INC);
             } else if (CCTK_Equals(fill_Aij, "Solver") || CCTK_Equals(fill_Aij, "Analytic Xi")) {
 	      CCTK_REAL *Xx;
@@ -188,12 +189,12 @@ extern "C" void CT_InitializeADM(CCTK_ARGUMENTS)
 	          Azz = 0;
                 }
 
-  	        admkxx[sindex] = trK[sindex] * admgxx[sindex] / 3.0 + Axx * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-  	        admkxy[sindex] = Axy * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkxz[sindex] = Axz * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkyy[sindex] = trK[sindex] * admgyy[sindex] / 3.0 + Ayy * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkyz[sindex] = Ayz * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
-	        admkzz[sindex] = trK[sindex] * admgzz[sindex] / 3.0 + Azz * pow(ct_psi[sindex]+ct_a0[sindex], -2.0);
+  	        admkxx[sindex] = trK[sindex] * admgxx[sindex] / 3.0 + Axx * pow(ct_psi[sindex]+a0[sindex], -2.0);
+  	        admkxy[sindex] = Axy * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkxz[sindex] = Axz * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkyy[sindex] = trK[sindex] * admgyy[sindex] / 3.0 + Ayy * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkyz[sindex] = Ayz * pow(ct_psi[sindex]+a0[sindex], -2.0);
+	        admkzz[sindex] = trK[sindex] * admgzz[sindex] / 3.0 + Azz * pow(ct_psi[sindex]+a0[sindex], -2.0);
               } LC_ENDLOOP3 (EL_INC2);
             } // if fill_Aij
           } // for tl
@@ -343,7 +344,7 @@ extern "C" void CT_ConvertToBSSN(CCTK_ARGUMENTS)
     {
       int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
-      CCTK_REAL W = pow(ct_psi[index]+ct_a0[index], -2.0);
+      CCTK_REAL W = pow(admgxx[index], 0.25);
       CCTK_REAL traceK = W * W * (admkxx[index]+admkyy[index]+admkzz[index]); 
 
       bssna[index] = W;
@@ -430,7 +431,7 @@ extern "C" void CT_ConvertToCCZ4(CCTK_ARGUMENTS)
     {
       int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
-      CCTK_REAL W = pow(ct_psi[index]+ct_a0[index], -2.0);
+      CCTK_REAL W = pow(admgxx[index], 0.25);
       CCTK_REAL traceK = W * W * (admkxx[index]+admkyy[index]+admkzz[index]); 
 
       ccz4a[index] = W;
