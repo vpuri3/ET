@@ -47,9 +47,6 @@ CoordBase::boundary_shiftout_z_upper = 0
 CartGrid3D::type = "coordbase"
 
 PeriodicCarpet::periodic   = "yes"
-PeriodicCarpet::periodic_x = "yes"
-PeriodicCarpet::periodic_y = "yes"
-PeriodicCarpet::periodic_z = "yes"
 
 ##################################################################################
 ActiveThorns = "IOUtil Carpet CarpetLib CarpetInterp LoopControl CarpetReduce CarpetSlab"
@@ -80,7 +77,7 @@ Carpet::output_timers_every      = 0
 CarpetLib::print_timestats_every = 0
 CarpetLib::print_memstats_every  = 0
 
-CarpetLib::max_allowed_memory_MB = 8192
+CarpetLib::max_allowed_memory_MB = 9216
 
 ##################################################################
 ActiveThorns = "CarpetRegrid2"
@@ -154,6 +151,7 @@ CT_Analytic::phasex                = 0.25
 CT_Analytic::phasey                = 0.25
 CT_Analytic::phasez                = 0.25
 CT_Analytic::free_data             = "exact"
+CT_Analytic::other_timelevels      = 3
 
 
 #################################
