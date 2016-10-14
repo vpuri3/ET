@@ -65,7 +65,7 @@ Carpet::prolongation_order_time  = 2
 Carpet::poison_new_timelevels = "yes"
 CarpetLib::poison_new_memory  = "yes"
 
-CarpetLib::max_allowed_memory_MB = 8192
+CarpetLib::max_allowed_memory_MB = 10240
 
 ##################################################################
 ActiveThorns = "CarpetRegrid2"
@@ -171,11 +171,16 @@ CT_Analytic::free_data             = "Lump"
 CT_Analytic::Kc			   = -0.1
 CT_Analytic::Ke			   = -0.1
 CT_Analytic::ampG                  = 1
+CT_Analytic::amp[0]                = 1
+CT_Analytic::sigmax[0]             = 0.5
+CT_Analytic::sigmay[0]             = 0.5
+CT_Analytic::sigmaz[0]             = 0.5
 CT_Analytic::ampC                  = 1
 CT_Analytic::ampI                  = 0.5
 CT_Analytic::ampVG                 = 0.1
-CT_Analytic::sigma                 = 0.2
 CT_Analytic::vecA                  = 0.6
+
+CT_Analytic::other_timelevels      = 3
 
 #################################
 ActiveThorns = "CarpetIOBasic"
