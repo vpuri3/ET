@@ -68,8 +68,8 @@ extern "C" void CT_Prolongate(CCTK_ARGUMENTS, const char *varname)
     for (int m=0; m<(int)arrdata.AT(g).size(); ++m) {
       for (int v = 0; v < (int)arrdata.AT(g).AT(m).data.size(); ++v) {
         ggf *const gv = arrdata.AT(g).AT(m).data.AT(v);
-        gv->ref_prolongate_all (state, tl, ll, ml, 0);
-        gv->ref_bnd_prolongate_all (state, tl, ll, ml, 0);
+        gv->ref_prolongate_all (state, tl, ll, ml, cctk_time);
+        gv->ref_bnd_prolongate_all (state, tl, ll, ml, cctk_time);
       }
     }
   } // for state
@@ -96,8 +96,8 @@ extern "C" void CT_ProlongateBndrs(CCTK_ARGUMENTS, const char *varname)
     for (int m=0; m<(int)arrdata.AT(g).size(); ++m) {
       for (int v = 0; v < (int)arrdata.AT(g).AT(m).data.size(); ++v) {
         ggf *const gv = arrdata.AT(g).AT(m).data.AT(v);
-//        gv->ref_prolongate_all (state, tl, ll, ml, 0);
-        gv->ref_bnd_prolongate_all (state, tl, ll, ml, 0);
+//        gv->ref_prolongate_all (state, tl, ll, ml, cctk_time);
+        gv->ref_bnd_prolongate_all (state, tl, ll, ml, cctk_time);
       }
     }
   } // for state
