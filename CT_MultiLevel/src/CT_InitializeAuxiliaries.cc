@@ -359,7 +359,7 @@ extern "C" void CT_ConvertToBSSN(CCTK_ARGUMENTS)
       bssngyz[index] = 0;
       bssngzz[index] = 1;
 
-      bssnphi[index] = W;
+      bssnphi[index] = pow(W, -2.0);
       bssntrK[index] = traceK;
 
       bssnAxx[index] = W * W * (admkxx[index] - one3rd * admgxx[index] * traceK);
@@ -446,7 +446,7 @@ extern "C" void CT_ConvertToCCZ4(CCTK_ARGUMENTS)
       ccz4gyz[index] = 0;
       ccz4gzz[index] = 1;
 
-      ccz4phi[index] = W;
+      ccz4phi[index] = pow(W, -2.0);
       ccz4trK[index] = traceK;
 
       ccz4Axx[index] = W * W * (admkxx[index] - one3rd * admgxx[index] * traceK);
