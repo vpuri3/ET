@@ -54,7 +54,8 @@ extern "C" void CT_InitializeADM(CCTK_ARGUMENTS)
         {
           if (CCTK_Equals(verbose, "yes")) CCTK_Info(CCTK_THORNSTRING, "Initializing the ADM variables...");
 
-          for (int tl=0; tl<=2; tl++)
+          // Only fill one tl with initial data
+          for (int tl=0; tl<1; tl++)
           {
             CCTK_REAL *admgxx = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ADMBase::gxx");
             CCTK_REAL *admgxy = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ADMBase::gxy");
@@ -299,7 +300,8 @@ extern "C" void CT_ConvertToBSSN(CCTK_ARGUMENTS)
 
   CCTK_REAL one3rd = 1.0/3.0;
 
-  for (int tl=0; tl<=2; tl++)
+  // Only fill one tl with initial data
+  for (int tl=0; tl<1; tl++)
   {
     CCTK_REAL *bssna = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ML_BSSN::alpha");
     CCTK_REAL *bssnb1 = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ML_BSSN::beta1");
@@ -386,7 +388,8 @@ extern "C" void CT_ConvertToCCZ4(CCTK_ARGUMENTS)
 
   CCTK_REAL one3rd = 1.0/3.0;
 
-  for (int tl=0; tl<=2; tl++)
+  // Only fill one tl with initial data
+  for (int tl=0; tl<1; tl++)
   {
     CCTK_REAL *ccz4a = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ML_CCZ4::alpha");
     CCTK_REAL *ccz4b1 = (CCTK_REAL *) CCTK_VarDataPtr(cctkGH, tl, "ML_CCZ4::beta1");
