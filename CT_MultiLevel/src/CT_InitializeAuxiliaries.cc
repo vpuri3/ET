@@ -346,8 +346,9 @@ extern "C" void CT_ConvertToBSSN(CCTK_ARGUMENTS)
     {
       int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
-      CCTK_REAL W = pow(admgxx[index], 0.25);
-      CCTK_REAL traceK = W * W * (admkxx[index]+admkyy[index]+admkzz[index]); 
+      CCTK_REAL psi = pow(admgxx[index], 0.25);
+      CCTK_REAL W   = pow(psi, -2.0);
+      CCTK_REAL traceK = pow(psi, -4.0) * (admkxx[index]+admkyy[index]+admkzz[index]); 
 
       bssna[index] = W;
       bssnb1[index] = 0;
@@ -361,15 +362,15 @@ extern "C" void CT_ConvertToBSSN(CCTK_ARGUMENTS)
       bssngyz[index] = 0;
       bssngzz[index] = 1;
 
-      bssnphi[index] = pow(W, -2.0);
+      bssnphi[index] = W;
       bssntrK[index] = traceK;
 
-      bssnAxx[index] = W * W * (admkxx[index] - one3rd * admgxx[index] * traceK);
-      bssnAxy[index] = W * W * (admkxy[index]);
-      bssnAxz[index] = W * W * (admkxz[index]);
-      bssnAyy[index] = W * W * (admkyy[index] - one3rd * admgyy[index] * traceK);
-      bssnAyz[index] = W * W * (admkyz[index]);
-      bssnAzz[index] = W * W * (admkzz[index] - one3rd * admgzz[index] * traceK);
+      bssnAxx[index] = psi * psi * (admkxx[index] - one3rd * admgxx[index] * traceK);
+      bssnAxy[index] = psi * psi * (admkxy[index]);
+      bssnAxz[index] = psi * psi * (admkxz[index]);
+      bssnAyy[index] = psi * psi * (admkyy[index] - one3rd * admgyy[index] * traceK);
+      bssnAyz[index] = psi * psi * (admkyz[index]);
+      bssnAzz[index] = psi * psi * (admkzz[index] - one3rd * admgzz[index] * traceK);
 
       bssnXx[index] = 0.0;
       bssnXy[index] = 0.0;
@@ -434,8 +435,9 @@ extern "C" void CT_ConvertToCCZ4(CCTK_ARGUMENTS)
     {
       int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
-      CCTK_REAL W = pow(admgxx[index], 0.25);
-      CCTK_REAL traceK = W * W * (admkxx[index]+admkyy[index]+admkzz[index]); 
+      CCTK_REAL psi = pow(admgxx[index], 0.25);
+      CCTK_REAL W   = pow(psi, -2.0);
+      CCTK_REAL traceK = pow(psi, -4.0) * (admkxx[index]+admkyy[index]+admkzz[index]); 
 
       ccz4a[index] = W;
       ccz4b1[index] = 0;
@@ -449,15 +451,15 @@ extern "C" void CT_ConvertToCCZ4(CCTK_ARGUMENTS)
       ccz4gyz[index] = 0;
       ccz4gzz[index] = 1;
 
-      ccz4phi[index] = pow(W, -2.0);
+      ccz4phi[index] = W;
       ccz4trK[index] = traceK;
 
-      ccz4Axx[index] = W * W * (admkxx[index] - one3rd * admgxx[index] * traceK);
-      ccz4Axy[index] = W * W * (admkxy[index]);
-      ccz4Axz[index] = W * W * (admkxz[index]);
-      ccz4Ayy[index] = W * W * (admkyy[index] - one3rd * admgyy[index] * traceK);
-      ccz4Ayz[index] = W * W * (admkyz[index]);
-      ccz4Azz[index] = W * W * (admkzz[index] - one3rd * admgzz[index] * traceK);
+      ccz4Axx[index] = psi * psi * (admkxx[index] - one3rd * admgxx[index] * traceK);
+      ccz4Axy[index] = psi * psi * (admkxy[index]);
+      ccz4Axz[index] = psi * psi * (admkxz[index]);
+      ccz4Ayy[index] = psi * psi * (admkyy[index] - one3rd * admgyy[index] * traceK);
+      ccz4Ayz[index] = psi * psi * (admkyz[index]);
+      ccz4Azz[index] = psi * psi * (admkzz[index] - one3rd * admgzz[index] * traceK);
 
       ccz4Xx[index] = 0.0;
       ccz4Xy[index] = 0.0;
