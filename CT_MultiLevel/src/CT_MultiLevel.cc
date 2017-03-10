@@ -26,7 +26,14 @@ extern "C" void CT_MultiLevel(CCTK_ARGUMENTS)
   CCTK_INT topMGl = topMGlevel > Carpet::reflevels - 1? Carpet::reflevels - 1: topMGlevel;
 
   if (CCTK_Equals(cycle_type, "V cycle"))
+  {
+    BEGIN_REFLEVEL_LOOP(cctkGH) {
+      CT_InitializePsi(CCTK_PASS_CTOC);
+      CT_InitializeError(CCTK_PASS_CTOC);
+    } END_REFLEVEL_LOOP;
+    
     CT_V(CCTK_PASS_CTOC, topMGl, 1);
+  }
   else if (CCTK_Equals(cycle_type, "FMG cycle"))
   {
     CT_RelaxPsi(CCTK_PASS_CTOC, 0, nrelsteps_bottom, 1, 0, 0, 0, rset_psi, 1, enforce_int);
