@@ -11,12 +11,13 @@ nNP               = 1
 include ${PETSC_DIR}/lib/petsc/conf/variables
 include ${PETSC_DIR}/lib/petsc/conf/rules
 
-ex1: ex1.o  chkopts
-	-${CLINKER} -o ex1 ex1.o  ${PETSC_KSP_LIB}
-	${RM} ex1.o
+2d: 2d.o  chkopts
+	-${CLINKER} -o 2d 2d.o  ${PETSC_KSP_LIB}
+	${RM} 2d.o
 
-test: test.o  chkopts
-	-${CLINKER} -o test test.o  ${PETSC_KSP_LIB}
-	${RM} test.o
+2dtest: 2dtest.o  chkopts
+	-${CLINKER} -o 2dtest 2dtest.o  ${PETSC_KSP_LIB}
+	${RM} 2dtest.o
+
 
 #include ${PETSC_DIR}/lib/petsc/conf/test

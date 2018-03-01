@@ -33,8 +33,6 @@ int main(int argc,char **args)
   ierr = PetscOptionsGetBool(NULL,NULL,"-nonzero_guess",&nonzeroguess,NULL);CHKERRQ(ierr);
 
   /*==================== THINGS TO DO =======================
-  1. is it possible to set n from options?
-  2. Make matrix shell
   3. Sequential AIJ sparse matrices for matrix of eigen vectors of matrix A.
   4. vector for matrix of eigenvalues of matrix A.
   5. look into MatSetOption(), KSPSetOption(), VecSetOption().
