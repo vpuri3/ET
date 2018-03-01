@@ -5,7 +5,7 @@ FPPFLAGS         =
 LOCDIR           = ~/ptsc
 EXAMPLESC        = ex1.c
 MANSEC           = KSP
-CLEANFILES       = rhs.vtk solution.vtk test *~ \#*\#
+CLEANFILES       = 2d 2dtest *~ \#*
 nNP               = 1
 
 include ${PETSC_DIR}/lib/petsc/conf/variables

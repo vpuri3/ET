@@ -5,6 +5,7 @@ static char help[] = "Solves a tridiagonal linear system with KSP.\n\n";
 
 typedef struct {
   PetscInt  nx, ny;
+  PetscReal dx, dy, dxinv, dyinv;
 } Ctx;
 
 PetscErrorCode multA(Mat A, Vec a, Vec b){
@@ -13,8 +14,8 @@ PetscErrorCode multA(Mat A, Vec a, Vec b){
   PetscErrorCode ierr;
   ierr = MatShellGetContext(A,&aa);
   PetscInt nx = aa->nx; PetscInt ny = aa->ny; 
-  PetscReal dxinv = (double) nx+1;
-  PetscReal dyinv = (double) ny+1;
+  double dxinv = aa->dxinv;
+  double dyinv = aa->dyinv;
   const PetscReal * a_ = NULL; PetscReal * b_ = NULL;
   ierr = VecGetArrayRead(a,&a_); CHKERRQ(ierr);
   ierr = VecGetArray(b,&b_); CHKERRQ(ierr);
@@ -38,48 +39,39 @@ PetscErrorCode multA(Mat A, Vec a, Vec b){
   return 0;
 }
 
+/* Learn to use FFTW with PETSc fore preconditioner matrix. */
+
 int main(int argc,char **args)
 {
   PetscErrorCode ierr;
   Vec         u, b; 
-  Mat         A; /* Second order Laplace Operator */
-  PetscInt    nx=10, ny=10, N=nx*ny; /* k is wavenumber */
-  Ctx         actx;
+  Mat         A, Vx, Vy; /* Second order Laplace Operator */
+  PetscInt    nx=10, ny=10, N=nx*ny;
+  Ctx         ctx;
 
   ierr = PetscInitialize(&argc,&args,(char*)0,help);if (ierr) return ierr;
   ierr = PetscOptionsGetInt(NULL,NULL,"-nx",&nx,NULL);CHKERRQ(ierr);
   ierr = PetscOptionsGetInt(NULL,NULL,"-ny",&ny,NULL);CHKERRQ(ierr);
 
-  /* putting in context information */
-  actx.nx = nx; actx.ny = ny;
+  /*----------computing constants and stuff----------*/
+  ctx.nx = nx; ctx.ny = ny;
+  ctx.dxinv = (double) nx+1; ctx.dyinv = (double) ny+1;
+  ctx.dx = 1/ctx.dxinv; ctx.dy = 1/ctx.dyinv;
 
-  /*------------------ MATRIX -----------------------
-    below command may not be necessary. Not sure rn.
-  ierr = MatCreate(PETSC_COMM_SELF,&A);CHKERRQ(ierr);
-  ierr = MatSetSizes(A,PETSC_DECIDE,PETSC_DECIDE,n,n);CHKERRQ(ierr);
-  ierr = MatSetFromOptions(A);CHKERRQ(ierr);
-  ierr = MatSetUp(A);CHKERRQ(ierr);
-  */
-
-  ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&actx,&A); CHKERRQ(ierr);
+  /*------------------ MATRICES -----------------------*/
+  ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&ctx,&A); CHKERRQ(ierr);
   ierr = MatShellSetOperation(A,MATOP_MULT,(void(*)(void)) multA);
   ierr = MatShellSetOperation(A,MATOP_MULT_TRANSPOSE,(void(*)(void)) multA);
 
-  /*----CREATING VECTORS--------------*/
+  ierr = MatCreateSeqDense(PETSC_COMM_SELF,nx,nx,NULL,&Vx); CHKERRQ(ierr);
+
+  /*----------------CREATING VECTORS--------------*/
   PetscReal * u_ = malloc(N*sizeof(PetscReal));
-  //PetscReal * b_ = malloc(N*sizeof(PetscReal));
-  for(int i=0;i<N;i++) u_[i] = 1; //b_[i] = 0;
+  for(int i=0;i<N;i++) u_[i] = 1;
 
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &b); CHKERRQ(ierr);
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &u); CHKERRQ(ierr);
-  //ierr = VecDuplicate(u,&b);CHKERRQ(ierr);
   ierr = VecPlaceArray(u,u_); CHKERRQ(ierr);
-
-  /*-------Doing stuff with vectors-----*/
-  ierr = MatMult(A,u,b);CHKERRQ(ierr);
-
-  printf("b\t");
-  ierr = VecView(b, PETSC_VIEWER_STDOUT_SELF);
 
   ierr = VecDestroy(&u);CHKERRQ(ierr); ierr = VecDestroy(&b);CHKERRQ(ierr);
   ierr = MatDestroy(&A);CHKERRQ(ierr);
