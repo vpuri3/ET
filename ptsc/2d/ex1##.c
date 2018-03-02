@@ -133,7 +133,7 @@ PetscInt main(PetscInt argc,char **args)
       if (view){ierr = VecView(y,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);}
       ierr = MatMultTranspose(A,y,z);CHKERRQ(ierr);
 
-      /* Output from Backward DFT needs to be modified to obtain user readable data the routine VecScatterFFTWToPetsc 
+      /* Output from Backward DFT needs to be modified to obtain user readable data. The routine VecScatterFFTWToPetsc 
          performs the job. In some sense this is the reverse operation of VecScatterPetscToFFTW. This routine gets rid of 
          the extra spaces that were artificially padded to perform real parallel transform.    */
       ierr = VecScatterFFTWToPetsc(A,z,output);CHKERRQ(ierr);

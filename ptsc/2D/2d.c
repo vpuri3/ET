@@ -45,7 +45,7 @@ int main(int argc,char **args)
 {
   PetscErrorCode ierr;
   Vec         u, b; 
-  Mat         A, Vx, Vy; /* Second order Laplace Operator */
+  Mat         A, F; /* Second order Laplace Operator, fft matrix */
   PetscInt    nx=10, ny=10, N=nx*ny;
   Ctx         ctx;
 
@@ -63,7 +63,10 @@ int main(int argc,char **args)
   ierr = MatShellSetOperation(A,MATOP_MULT,(void(*)(void)) multA);
   ierr = MatShellSetOperation(A,MATOP_MULT_TRANSPOSE,(void(*)(void)) multA);
 
-  ierr = MatCreateSeqDense(PETSC_COMM_SELF,nx,nx,NULL,&Vx); CHKERRQ(ierr);
+  PetscInt * dim = malloc(2*sizeof(PetscInt));
+  dim[0] = nx; dim[1] = ny;
+  ierr = MatCreateFFT(PETSC_COMM_SELF,2,dim,MATFFTW,&F);CHKERRQ(ierr);
+  
 
   /*----------------CREATING VECTORS--------------*/
   PetscReal * u_ = malloc(N*sizeof(PetscReal));
