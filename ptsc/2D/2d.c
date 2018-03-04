@@ -2,6 +2,7 @@ static char help[] = "Solves a tridiagonal linear system with KSP.\n\n";
 
 #include <petscksp.h>
 #include <math.h>
+#include <fftw3.h>
 
 typedef struct {
   PetscInt  nx, ny;
