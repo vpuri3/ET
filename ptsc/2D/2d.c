@@ -3,83 +3,71 @@ static char help[] = "Solves a tridiagonal linear system with KSP.\n\n";
 #include <petscksp.h>
 #include <math.h>
 #include <fftw3.h>
-
-typedef struct {
-  PetscInt  nx, ny;
-  PetscReal dx, dy, dxinv, dyinv;
-} Ctx;
-
-PetscErrorCode multA(Mat A, Vec a, Vec b){
-  PetscInt idx;
-  Ctx *aa = NULL;
-  PetscErrorCode ierr;
-  ierr = MatShellGetContext(A,&aa);
-  PetscInt nx = aa->nx; PetscInt ny = aa->ny; 
-  double dxinv = aa->dxinv;
-  double dyinv = aa->dyinv;
-  const PetscReal * a_ = NULL; PetscReal * b_ = NULL;
-  ierr = VecGetArrayRead(a,&a_); CHKERRQ(ierr);
-  ierr = VecGetArray(b,&b_); CHKERRQ(ierr);
-  PetscReal xm1, xp1, ym1, yp1;
-  for(int j=0;j<ny;j++){
-    for(int i=0;i<nx;i++){
-      idx = j*ny + i;
-      if (i == 0) xm1 = 0;
-      else xm1 = a_[idx-1];
-      if(i == nx-1) xp1 = 0;
-      else xp1 = a_[idx+1];
-      if (j == 0) ym1 = 0;
-      else ym1 = a_[idx-nx];
-      if(j == ny-1) yp1 = 0;
-      else yp1 = a_[idx+nx];
-      b_[idx] = dxinv*dxinv*(-xm1+2*a_[idx]-xp1) + dyinv*dyinv*(-ym1+2*a_[idx]-yp1);
-    }
-  }
-  VecRestoreArrayRead(a,&a_);
-  VecRestoreArray(b,&b_);
-  return 0;
-}
-
-/* Learn to use FFTW with PETSc fore preconditioner matrix. */
+#include "2d.h"
 
 int main(int argc,char **args)
 {
   PetscErrorCode ierr;
-  Vec         u, b; 
+  Vec         x, u, b, d;
   Mat         A, F; /* Second order Laplace Operator, fft matrix */
-  PetscInt    nx=10, ny=10, N=nx*ny;
+  PetscInt    idx, nx=2, ny=5, N=nx*ny;
   Ctx         ctx;
+  fftw_plan   p;
 
   ierr = PetscInitialize(&argc,&args,(char*)0,help);if (ierr) return ierr;
   ierr = PetscOptionsGetInt(NULL,NULL,"-nx",&nx,NULL);CHKERRQ(ierr);
   ierr = PetscOptionsGetInt(NULL,NULL,"-ny",&ny,NULL);CHKERRQ(ierr);
 
-  /*----------computing constants and stuff----------*/
+  PetscReal * u_ = malloc(N*sizeof(PetscReal));
+  PetscReal * x_ = malloc(N*sizeof(PetscReal));
+  PetscReal * d_ = malloc(N*sizeof(PetscReal));
+
   ctx.nx = nx; ctx.ny = ny;
   ctx.dxinv = (double) nx+1; ctx.dyinv = (double) ny+1;
   ctx.dx = 1/ctx.dxinv; ctx.dy = 1/ctx.dyinv;
+  ctx.p = p; ctx.fft_factor = (double) 0.25/(N+1)/(nx+1);
+  ctx.x_ = x_;  
+  ctx.d = &d;
+  /*----------------CREATING VECTORS--------------*/
+  for(int i=0;i<N;i++){ u_[i]=i; x_[i]=1;}
+
+  /* fill d_ with diagonal values and take reciprocal */
+  for(int j=0;j<ny;j++){
+    for(int i=0;i<nx;i++){
+      idx = j*nx+i;
+      d_[idx] = 1;
+      d_[idx] = 1/d_[idx];
+    }
+  }
+
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &b); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &u); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &x); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &d); CHKERRQ(ierr);
+  ierr = VecPlaceArray(u,u_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(x,x_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(d,d_); CHKERRQ(ierr);
 
   /*------------------ MATRICES -----------------------*/
   ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&ctx,&A); CHKERRQ(ierr);
   ierr = MatShellSetOperation(A,MATOP_MULT,(void(*)(void)) multA);
   ierr = MatShellSetOperation(A,MATOP_MULT_TRANSPOSE,(void(*)(void)) multA);
 
-  PetscInt * dim = malloc(2*sizeof(PetscInt));
-  dim[0] = nx; dim[1] = ny;
-  ierr = MatCreateFFT(PETSC_COMM_SELF,2,dim,MATFFTW,&F);CHKERRQ(ierr);
-  
+  ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&ctx,&F); CHKERRQ(ierr);
+  ierr = MatShellSetOperation(F,MATOP_MULT,(void(*)(void)) multF);
 
-  /*----------------CREATING VECTORS--------------*/
-  PetscReal * u_ = malloc(N*sizeof(PetscReal));
-  for(int i=0;i<N;i++) u_[i] = 1;
+  /*--------------FFTW Plan--------------*/
 
-  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &b); CHKERRQ(ierr);
-  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &u); CHKERRQ(ierr);
-  ierr = VecPlaceArray(u,u_); CHKERRQ(ierr);
+  printf("u\n");
+  for(int i=0;i<N;i++) printf("%f\t",u_[i]); printf("\n");
+  ierr = MatMult(F,u,x); CHKERRQ(ierr);
+  printf("x\n");
+  for(int i=0;i<N;i++) printf("%f\t",x_[i]); printf("\n");
 
   ierr = VecDestroy(&u);CHKERRQ(ierr); ierr = VecDestroy(&b);CHKERRQ(ierr);
-  ierr = MatDestroy(&A);CHKERRQ(ierr);
+  ierr = MatDestroy(&A);CHKERRQ(ierr); ierr = MatDestroy(&F);CHKERRQ(ierr);
   free(u_);
+  free(x_);
   ierr = PetscFinalize();
   return ierr;
 }
