@@ -19,7 +19,7 @@ int main(int argc,char **args)
 
   dxinv = (double) nx+1; dyinv = (double) ny+1;
   dx = 1/dxinv; dy = 1/dyinv;
-  fft_factor = (double) 0.25/(N+1)/(nx+1);
+  fft_factor = (double) 0.25/(N+1); /* find correct factor */
 
   ierr = PetscInitialize(&argc,&args,(char*)0,help);if (ierr) return ierr;
   ierr = PetscOptionsGetInt(NULL,NULL,"-nx",&nx,NULL);CHKERRQ(ierr);
