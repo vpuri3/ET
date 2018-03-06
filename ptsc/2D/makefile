@@ -5,7 +5,7 @@ FPPFLAGS         =
 LOCDIR           = ~/ptsc
 EXAMPLESC        = ex1.c
 MANSEC           = KSP
-CLEANFILES       = 2d 2dtest fftw1d fftw2d *.o a.out *~ \#*
+CLEANFILES       = 2d test fftw1d fftw2d *.o a.out *~ \#*
 nNP               = 1
 
 include ${PETSC_DIR}/lib/petsc/conf/variables
@@ -15,9 +15,9 @@ include ${PETSC_DIR}/lib/petsc/conf/rules
 	-${CLINKER} -o 2d 2d.o  ${PETSC_KSP_LIB} -lfftw3 -lm
 	${RM} 2d.o
 
-2dtest: 2dtest.o  chkopts
-	-${CLINKER} -o 2dtest 2dtest.o  ${PETSC_KSP_LIB}
-	${RM} 2dtest.o
+test: test.o  chkopts
+	-${CLINKER} -o test test.o  ${PETSC_KSP_LIB}
+	${RM} test.o
 
 fftw1d: fftw1d.o
 	gcc -o fftw1d fftw1d.c -lfftw3 -lm
