@@ -39,6 +39,12 @@ PetscErrorCode multA(Mat A, Vec a, Vec b){
   return 0;
 }
 
+PetscErrorCode multATransp(Mat A, Vec a, Vec b){
+  PetscErrorCode ierr;
+  ierr = MatMult(A,a,b);
+  return ierr;
+}
+
 PetscErrorCode multF(Mat F, Vec a, Vec b){
   PetscErrorCode ierr;
   Ctx *aa = NULL; ierr = MatShellGetContext(F,&aa);
@@ -52,7 +58,6 @@ PetscErrorCode multF(Mat F, Vec a, Vec b){
   //for(int i=0;i<aa->nx*aa->ny;i++) printf("%f\t",b_[i]); printf("\n");
 
   ierr = VecPointwiseMult(b,b,*(aa->dptr));
-  //for(int i=0;i<aa->nx*aa->ny;i++) b_[i] = b_[i]*aa->d_[i];
   //printf("b after manipulation in transform space\n");
   //for(int i=0;i<aa->nx*aa->ny;i++) printf("%f\t",b_[i]); printf("\n");
 
@@ -61,6 +66,12 @@ PetscErrorCode multF(Mat F, Vec a, Vec b){
   ierr = VecRestoreArray(b,&b_);
   ierr = VecScale(b, aa->fft_factor);
   return 0;
+}
+
+PetscErrorCode multFTransp(Mat F, Vec a, Vec b){
+  PetscErrorCode ierr;
+  ierr = MatMult(F,a,b);
+  return ierr;
 }
 
 PetscErrorCode precondition(PC pc, Vec a, Vec b){

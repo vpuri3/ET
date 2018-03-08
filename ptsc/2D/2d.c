@@ -11,7 +11,7 @@ int main(int argc,char **args)
   PetscErrorCode ierr;
   Vec            x, u, f, d;         /*unknown, true, rhs, diagonal elements*/
   Mat            A, F;               /*second order Laplace Operator, fft matrix*/
-  PetscInt       idx, nx=20, ny=20, N=nx*ny;
+  PetscInt       idx, nx=200, ny=500, N=nx*ny;
   Ctx            ctx;                /*data structure to pass information around*/
   KSP            ksp;
   PC             pc;
@@ -31,14 +31,16 @@ int main(int argc,char **args)
   PetscReal * f_ = malloc(N*sizeof(PetscReal));
   PetscReal * d_ = malloc(N*sizeof(PetscReal));
 
-  PetscReal xx=0,yy=0;
+  PetscReal xx=0,yy=0, ii=0, jj=0;
   for(int j=0;j<ny;j++){ for(int i=0;i<nx;i++){
       idx = j*nx+i;
-      xx = i*dx; yy = j*dy;
+      xx = i*dx; yy = j*dy; ii = i+1; jj = j+1;
       u_[idx] = xx*xx + exp(yy);
       x_[idx] = 0.1;
       f_[idx] = 0;
-      d_[idx] = 1; d_[idx] = 1/d_[idx];}
+      d_[idx] = 2*dxinv*dxinv*(1-cos(ii*M_PI*dx));
+      d_[idx] += 2*dyinv*dyinv*(1-cos(jj*M_PI*dy)); /* x eig val + y eig val */
+    }
   }
 
   /*----------------Putting things in context-------------*/
@@ -58,13 +60,16 @@ int main(int argc,char **args)
   ierr = VecPlaceArray(f,f_); CHKERRQ(ierr);
   ierr = VecPlaceArray(d,d_); CHKERRQ(ierr);
 
+  ierr = VecReciprocal(d);
+
   /*------------------ MATRICES -----------------------*/
   ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&ctx,&A); CHKERRQ(ierr);
   ierr = MatShellSetOperation(A,MATOP_MULT,(void(*)(void)) multA);
-  ierr = MatShellSetOperation(A,MATOP_MULT_TRANSPOSE,(void(*)(void)) multA);
+  ierr = MatShellSetOperation(A,MATOP_MULT_TRANSPOSE,(void(*)(void)) multATransp);
 
   ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&ctx,&F); CHKERRQ(ierr);
   ierr = MatShellSetOperation(F,MATOP_MULT,(void(*)(void)) multF);
+  ierr = MatShellSetOperation(F,MATOP_MULT_TRANSPOSE,(void(*)(void)) multFTransp);
 
   /*----------------------FFTW--------------------------*/
   /*
