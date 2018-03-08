@@ -11,7 +11,7 @@ int main(int argc,char **args)
   PetscErrorCode ierr;
   Vec            x, u, f, d;         /*unknown, true, rhs, diagonal elements*/
   Mat            A, F;               /*second order Laplace Operator, fft matrix*/
-  PetscInt       idx, nx=2, ny=5, N=nx*ny;
+  PetscInt       idx, nx=20, ny=20, N=nx*ny;
   Ctx            ctx;                /*data structure to pass information around*/
   KSP            ksp;
   PC             pc;
@@ -19,7 +19,7 @@ int main(int argc,char **args)
 
   dxinv = (double) nx+1; dyinv = (double) ny+1;
   dx = 1/dxinv; dy = 1/dyinv;
-  fft_factor = (double) 0.25/(N+1); /* find correct factor */
+  fft_factor = (double) 0.25/(ny+1)/(nx+1);
 
   ierr = PetscInitialize(&argc,&args,(char*)0,help);if (ierr) return ierr;
   ierr = PetscOptionsGetInt(NULL,NULL,"-nx",&nx,NULL);CHKERRQ(ierr);
@@ -32,17 +32,13 @@ int main(int argc,char **args)
   PetscReal * d_ = malloc(N*sizeof(PetscReal));
 
   PetscReal xx=0,yy=0;
-  for(idx=0;idx<N;idx++){
-    xx += dx; yy += dy;
-    u_[idx] = xx*xx + exp(yy);
-    x_[idx] = 0.1; /* initial guess */
-    f_[idx] = 0;
-  }
-
   for(int j=0;j<ny;j++){ for(int i=0;i<nx;i++){
       idx = j*nx+i;
-      d_[idx] = 1;
-      d_[idx] = 1/d_[idx];}
+      xx = i*dx; yy = j*dy;
+      u_[idx] = xx*xx + exp(yy);
+      x_[idx] = 0.1;
+      f_[idx] = 0;
+      d_[idx] = 1; d_[idx] = 1/d_[idx];}
   }
 
   /*----------------Putting things in context-------------*/
@@ -50,6 +46,7 @@ int main(int argc,char **args)
   ctx.dx = dx; ctx.dy = dy; ctx.dxinv = dxinv; ctx.dyinv = dyinv;
   ctx.fft_factor = fft_factor;
   ctx.dptr = &d; ctx.d_ = d_;
+  ctx.Fptr = &F;
 
   /*----------------CREATING VECTORS--------------------*/
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &x); CHKERRQ(ierr);
@@ -82,21 +79,25 @@ int main(int argc,char **args)
   ierr = KSPSetOperators(ksp,A,A);CHKERRQ(ierr);
 
   ierr = KSPGetPC(ksp,&pc);CHKERRQ(ierr);
-  ierr = PCSetType(pc,PCNONE); CHKERRQ(ierr); /* look up PCShellSetApply() when using PCSHELL */
+  ierr = PCSetType(pc,PCSHELL); CHKERRQ(ierr); /* look up PCShellSetApply() when using PCSHELL */
 
-  ierr = KSPSetType(ksp,KSPBICG);CHKERRQ(ierr);
+  ierr = PCShellSetApply(pc,precondition);
+  ierr = PCShellSetContext(pc,&ctx);
+
+  ierr = KSPSetType(ksp,KSPBCGS);CHKERRQ(ierr);
+  ierr = KSPSetTolerances(ksp,1e-12,1e-12,PETSC_DEFAULT,PETSC_DEFAULT);
   ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
 
   /*------------------Solving-----------------------*/
   ierr = MatMult(A,u,f);
-  ierr = KSPSolve(ksp,f,x);
   ierr = KSPView(ksp,PETSC_VIEWER_STDOUT_SELF);CHKERRQ(ierr);
+  ierr = KSPSolve(ksp,f,x);
 
   /*-------------------End Credits---------------------*/
   ierr = VecDestroy(&x);CHKERRQ(ierr); ierr = VecDestroy(&u);CHKERRQ(ierr);
   ierr = VecDestroy(&f);CHKERRQ(ierr); ierr = VecDestroy(&d);CHKERRQ(ierr);
   ierr = MatDestroy(&A);CHKERRQ(ierr); ierr = MatDestroy(&F);CHKERRQ(ierr);
-
+  ierr = KSPDestroy(&ksp);
   free(x_); free(u_);
   free(f_); free(d_);
   ierr = PetscFinalize();

@@ -5,6 +5,7 @@ typedef struct {
   double fft_factor;
   Vec * dptr; /* vector of diagonal elements */
   double * d_;
+  Mat * Fptr;
 } Ctx;
 
 PetscErrorCode multA(Mat A, Vec a, Vec b){
@@ -47,17 +48,27 @@ PetscErrorCode multF(Mat F, Vec a, Vec b){
   ierr = VecCopy(a,b);
 
   fftw_execute(p);
-  printf("b sine transformed\n");
-  for(int i=0;i<aa->nx*aa->ny;i++) printf("%f\t",b_[i]); printf("\n");
+  //printf("b sine transformed\n");
+  //for(int i=0;i<aa->nx*aa->ny;i++) printf("%f\t",b_[i]); printf("\n");
 
   ierr = VecPointwiseMult(b,b,*(aa->dptr));
   //for(int i=0;i<aa->nx*aa->ny;i++) b_[i] = b_[i]*aa->d_[i];
-  printf("b after manipulation in transform space\n");
-  for(int i=0;i<aa->nx*aa->ny;i++) printf("%f\t",b_[i]); printf("\n");
+  //printf("b after manipulation in transform space\n");
+  //for(int i=0;i<aa->nx*aa->ny;i++) printf("%f\t",b_[i]); printf("\n");
 
   fftw_execute(p);
   fftw_destroy_plan(p);
   ierr = VecRestoreArray(b,&b_);
   ierr = VecScale(b, aa->fft_factor);
+  return 0;
+}
+
+PetscErrorCode precondition(PC pc, Vec a, Vec b){
+  PetscErrorCode ierr;
+  void *vptr = NULL; PCShellGetContext(pc,&vptr);
+  Ctx * aa = vptr;
+  Mat *Fptr = aa->Fptr;
+  ierr = MatMult(*Fptr,a,b);
+
   return 0;
 }

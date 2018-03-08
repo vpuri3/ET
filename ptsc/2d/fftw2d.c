@@ -30,14 +30,14 @@ int main(){
   for(int i=0;i<N;i++) printf("%f\t",in[i]);
   printf("\n");
 
-  double d = 1;
+  double d = 2;
   for(int i=0;i<N;i++) in[i] = (double) in[i]*d;
   printf("Did some manipulation\n");
   for(int i=0;i<N;i++) printf("%f\t",in[i]);
   printf("\n");
 
   fftw_execute(p); /* find correct factor */
-  double factor = (double) 0.25/(N+1);
+  double factor = (double) 0.25/(ny+1)/(nx+1);
   for(int i=0;i<N;i++) in[i] = in[i]*factor;
   printf("Inverse Transformed\n");
   for(int i=0;i<N;i++) printf("%f\t",in[i]);
