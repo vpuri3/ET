@@ -1,5 +1,8 @@
 
-static char help[] = "Solves Lapl(u)=f with KSP + Kronecker Preconditioner in 2D.\n\n";
+static char help[] = "Solves scaled Laplace eqn with variable coefficients in 2D.\n\n";
+
+/* solves cxx*u_xx + cyy*u_yy = r. Domain: [0,1]^2. grid size: nx*ny */
+
 
 #include <petscksp.h>
 #include <math.h>
@@ -9,10 +12,10 @@ static char help[] = "Solves Lapl(u)=f with KSP + Kronecker Preconditioner in 2D
 int main(int argc,char **args)
 {
   PetscErrorCode ierr;
-  Vec            x, u, f, d;         /*unknown, true, rhs, diagonal elements*/
-  Mat            A, F;               /*second order Laplace Operator, fft matrix*/
-  PetscInt       idx, nx=200, ny=500, N=nx*ny;
-  Ctx            ctx;                /*data structure to pass information around*/
+  Vec            x, u, f, d, cxx, cyy, cave;  /*unknown, true, rhs, diagonals, coeffs*/
+  Mat            A, F;                        /*second order Laplace Operator, fft matrix*/
+  PetscInt       idx, nx=500, ny=500, N=nx*ny;
+  Ctx            ctx;                         /*data structure to pass information around*/
   KSP            ksp;
   PC             pc;
   PetscReal      dx, dy, dxinv, dyinv, fft_factor; /* to pass to ctx */
@@ -30,6 +33,9 @@ int main(int argc,char **args)
   PetscReal * u_ = malloc(N*sizeof(PetscReal));
   PetscReal * f_ = malloc(N*sizeof(PetscReal));
   PetscReal * d_ = malloc(N*sizeof(PetscReal));
+  PetscReal * cxx_ = malloc(N*sizeof(PetscReal));
+  PetscReal * cyy_ = malloc(N*sizeof(PetscReal));
+  PetscReal * cave_ = malloc(N*sizeof(PetscReal));
 
   PetscReal xx=0,yy=0, ii=0, jj=0;
   for(int j=0;j<ny;j++){ for(int i=0;i<nx;i++){
@@ -40,6 +46,8 @@ int main(int argc,char **args)
       f_[idx] = 0;
       d_[idx] = 2*dxinv*dxinv*(1-cos(ii*M_PI*dx));
       d_[idx] += 2*dyinv*dyinv*(1-cos(jj*M_PI*dy)); /* x eig val + y eig val */
+      cxx_[idx] = xx +1;
+      cyy_[idx] = xx*xx +1;
     }
   }
 
@@ -47,21 +55,30 @@ int main(int argc,char **args)
   ctx.nx = nx; ctx.ny = ny; ctx.N = N;
   ctx.dx = dx; ctx.dy = dy; ctx.dxinv = dxinv; ctx.dyinv = dyinv;
   ctx.fft_factor = fft_factor;
-  ctx.dptr = &d; ctx.d_ = d_;
+  ctx.dptr = &d; ctx.cxxptr = &cxx; ctx.cyyptr = &cyy; ctx.caveptr = &cave;
   ctx.Fptr = &F;
+  ctx.cxx_ = cxx_; ctx.cyy_ = cyy_;
 
   /*----------------CREATING VECTORS--------------------*/
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &x); CHKERRQ(ierr);
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &u); CHKERRQ(ierr);
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &f); CHKERRQ(ierr);
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &d); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &cxx); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &cyy); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &cave); CHKERRQ(ierr);
   ierr = VecPlaceArray(x,x_); CHKERRQ(ierr);
   ierr = VecPlaceArray(u,u_); CHKERRQ(ierr);
   ierr = VecPlaceArray(f,f_); CHKERRQ(ierr);
   ierr = VecPlaceArray(d,d_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(cxx,cxx_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(cyy,cyy_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(cave,cave_); CHKERRQ(ierr);
 
   ierr = VecReciprocal(d);
-
+  ierr = VecCopy(cxx,cave);
+  ierr = VecAXPBY(cave,0.5,0.5,cyy);
+  ierr = VecReciprocal(cave);
   /*------------------ MATRICES -----------------------*/
   ierr = MatCreateShell(PETSC_COMM_SELF,N,N,N,N,(void*)&ctx,&A); CHKERRQ(ierr);
   ierr = MatShellSetOperation(A,MATOP_MULT,(void(*)(void)) multA);
@@ -71,14 +88,6 @@ int main(int argc,char **args)
   ierr = MatShellSetOperation(F,MATOP_MULT,(void(*)(void)) multF);
   ierr = MatShellSetOperation(F,MATOP_MULT_TRANSPOSE,(void(*)(void)) multFTransp);
 
-  /*----------------------FFTW--------------------------*/
-  /*
-  printf("u\n");
-  for(int i=0;i<N;i++) printf("%f\t",u_[i]); printf("\n");
-  ierr = MatMult(F,u,x); CHKERRQ(ierr);
-  printf("x\n");
-  for(int i=0;i<N;i++) printf("%f\t",x_[i]); printf("\n");
-  */
   /*----------------------KSP-------------------------*/
   ierr = KSPCreate(PETSC_COMM_SELF,&ksp);CHKERRQ(ierr);
   ierr = KSPSetOperators(ksp,A,A);CHKERRQ(ierr);
@@ -97,6 +106,11 @@ int main(int argc,char **args)
   ierr = MatMult(A,u,f);
   ierr = KSPView(ksp,PETSC_VIEWER_STDOUT_SELF);CHKERRQ(ierr);
   ierr = KSPSolve(ksp,f,x);
+  /* get error */
+  ierr = VecAXPY(x,-1,u);
+  double e;
+  ierr = VecNorm(x,NORM_2,&e);
+  ierr = PetscPrintf(PETSC_COMM_SELF,"Norm of error is %g.",(double)e);CHKERRQ(ierr);
 
   /*-------------------End Credits---------------------*/
   ierr = VecDestroy(&x);CHKERRQ(ierr); ierr = VecDestroy(&u);CHKERRQ(ierr);
