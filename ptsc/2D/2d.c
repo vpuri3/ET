@@ -46,8 +46,8 @@ int main(int argc,char **args)
       f_[idx] = 0;
       d_[idx] = 2*dxinv*dxinv*(1-cos(ii*M_PI*dx));
       d_[idx] += 2*dyinv*dyinv*(1-cos(jj*M_PI*dy)); /* x eig val + y eig val */
-      cxx_[idx] = xx +1;
-      cyy_[idx] = xx*xx +1;
+      cxx_[idx] = exp(xx*yy);
+      cyy_[idx] = sin(xx*M_PI);
     }
   }
 
