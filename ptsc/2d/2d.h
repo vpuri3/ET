@@ -3,7 +3,7 @@ typedef struct {
   PetscInt  nx, ny, N;
   PetscReal dx, dy, dxinv, dyinv;
   double fft_factor;
-  Vec *dptr, *cxxptr, *cyyptr, *caveptr;
+  Vec *dptr, *cxxptr, *cyyptr, *caveptr, *c1ptr, *tempptr;
   double *cxx_, *cyy_;
   Mat * Fptr;
 } Ctx;
@@ -34,6 +34,8 @@ PetscErrorCode multA(Mat A, Vec a, Vec b){
       b_[idx] += aa->cyy_[idx] * dyinv*dyinv*(-ym1+2*a_[idx]-yp1);
     }
   }
+  ierr = VecPointwiseMult(*(aa->tempptr),a,*(aa->c1ptr));
+  ierr = VecAXPY(b,1,*(aa->tempptr));
   ierr = VecRestoreArrayRead(a,&a_);
   ierr = VecRestoreArray(b,&b_);
   return ierr;
@@ -65,6 +67,8 @@ PetscErrorCode multATransp(Mat A, Vec a, Vec b){
       b_[idx] += dyinv*dyinv*(-ym1+2*a_[idx]*aa->cyy_[idx]-yp1);
     }
   }
+  ierr = VecPointwiseMult(*(aa->tempptr),a,*(aa->c1ptr));
+  ierr = VecAXPY(b,1,*(aa->tempptr));
   ierr = VecRestoreArrayRead(a,&a_);
   ierr = VecRestoreArray(b,&b_);
   return ierr;

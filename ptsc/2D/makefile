@@ -11,8 +11,6 @@ nNP               = 1
 include ${PETSC_DIR}/lib/petsc/conf/variables
 include ${PETSC_DIR}/lib/petsc/conf/rules
 
-# hey Pablo you should be able to see this.
-
 2d: 2d.o  chkopts
 	-${CLINKER} -o 2d 2d.o  ${PETSC_KSP_LIB} -lfftw3 -lm
 	${RM} 2d.o

@@ -1,7 +1,7 @@
 
 static char help[] = "Solves scaled Laplace eqn with variable coefficients in 2D.\n\n";
 
-/* solves cxx*u_xx + cyy*u_yy = r. Domain: [0,1]^2. grid size: nx*ny */
+/* solves cxx*u_xx + cyy*u_yy + c1*u = r. Domain: [0,1]^2. grid size: nx*ny */
 
 
 #include <petscksp.h>
@@ -12,7 +12,7 @@ static char help[] = "Solves scaled Laplace eqn with variable coefficients in 2D
 int main(int argc,char **args)
 {
   PetscErrorCode ierr;
-  Vec            x, u, f, d, cxx, cyy, cave;  /*unknown, true, rhs, diagonals, coeffs*/
+  Vec            x, u, f, d, cxx, cyy, cave, c1, temp;  /*unknown, true, rhs, diagonals, coeffs*/
   Mat            A, F;                        /*second order Laplace Operator, fft matrix*/
   PetscInt       idx, nx=500, ny=500, N=nx*ny;
   Ctx            ctx;                         /*data structure to pass information around*/
@@ -36,6 +36,8 @@ int main(int argc,char **args)
   PetscReal * cxx_ = malloc(N*sizeof(PetscReal));
   PetscReal * cyy_ = malloc(N*sizeof(PetscReal));
   PetscReal * cave_ = malloc(N*sizeof(PetscReal));
+  PetscReal * c1_ = malloc(N*sizeof(PetscReal));
+  PetscReal * temp_ = malloc(N*sizeof(PetscReal));
 
   PetscReal xx=0,yy=0, ii=0, jj=0;
   for(int j=0;j<ny;j++){ for(int i=0;i<nx;i++){
@@ -46,8 +48,9 @@ int main(int argc,char **args)
       f_[idx] = 0;
       d_[idx] = 2*dxinv*dxinv*(1-cos(ii*M_PI*dx));
       d_[idx] += 2*dyinv*dyinv*(1-cos(jj*M_PI*dy)); /* x eig val + y eig val */
-      cxx_[idx] = exp(xx*yy);
-      cyy_[idx] = sin(xx*M_PI);
+      cxx_[idx] = exp(xx+yy);
+      cyy_[idx] = yy*yy*yy+1;
+      c1_[idx] = xx + exp(yy*yy);
     }
   }
 
@@ -56,6 +59,7 @@ int main(int argc,char **args)
   ctx.dx = dx; ctx.dy = dy; ctx.dxinv = dxinv; ctx.dyinv = dyinv;
   ctx.fft_factor = fft_factor;
   ctx.dptr = &d; ctx.cxxptr = &cxx; ctx.cyyptr = &cyy; ctx.caveptr = &cave;
+  ctx.c1ptr = &c1; ctx.tempptr = &temp;
   ctx.Fptr = &F;
   ctx.cxx_ = cxx_; ctx.cyy_ = cyy_;
 
@@ -67,6 +71,8 @@ int main(int argc,char **args)
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &cxx); CHKERRQ(ierr);
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &cyy); CHKERRQ(ierr);
   ierr = VecCreateSeq(PETSC_COMM_SELF, N, &cave); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &c1); CHKERRQ(ierr);
+  ierr = VecCreateSeq(PETSC_COMM_SELF, N, &temp); CHKERRQ(ierr);
   ierr = VecPlaceArray(x,x_); CHKERRQ(ierr);
   ierr = VecPlaceArray(u,u_); CHKERRQ(ierr);
   ierr = VecPlaceArray(f,f_); CHKERRQ(ierr);
@@ -74,6 +80,8 @@ int main(int argc,char **args)
   ierr = VecPlaceArray(cxx,cxx_); CHKERRQ(ierr);
   ierr = VecPlaceArray(cyy,cyy_); CHKERRQ(ierr);
   ierr = VecPlaceArray(cave,cave_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(c1,c1_); CHKERRQ(ierr);
+  ierr = VecPlaceArray(temp,temp_); CHKERRQ(ierr);
 
   ierr = VecReciprocal(d);
   ierr = VecCopy(cxx,cave);
