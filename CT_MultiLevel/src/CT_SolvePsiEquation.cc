@@ -9,6 +9,9 @@
 
 #include "CT_MultiLevel.hh"
 
+// this needs PETSc in ther REQUIRES line of configuration.ccl
+// #include "petsc.h"
+
 static void CT_PETScSolve(CCTK_ARGUMENTS);
 
 extern "C" void CT_SolvePsiEquation(CCTK_ARGUMENTS, CCTK_REAL *norm, CCTK_INT *step)
@@ -203,6 +206,9 @@ static void CT_PETScSolve(CCTK_ARGUMENTS)
       }
     }
   }
+
+  //int foo;
+  //PetscOptionsGetInt(NULL,NULL,"-M",&foo,NULL);
 
   fprintf(stderr, "Done on reflevel %d component %d iteration %d on process %d\n",
           Carpet::reflevel, Carpet::component, cctk_iteration, myproc);
