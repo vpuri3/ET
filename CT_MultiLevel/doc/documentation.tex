@@ -177,9 +177,10 @@ Each equation in the system to solve is parametrized as
 follows:
 \begin{eqnarray}
 c_{xx} \partial_{xx} \psi + c_{xy} \partial_{xy} \psi + c_{xz} \partial_{xz} \psi + 
-c_{yy} \partial_{yy} \psi + c_{yz} \partial_{yz} \psi + c_{zz} \partial_{zz} \psi &+& \\
+c_{yy} \partial_{yy} \psi + c_{yz} \partial_{yz} \psi + c_{zz} \partial_{zz} \psi &+& \nonumber\\
 c_{x} \partial_{x} \psi + c_{y} \partial_{y} \psi + c_{z} \partial_{z} \psi +
-c_{0} \psi^{n_0} + c_{1} \psi^{n_1} + c_{2} \psi^{n_2} + c_{3} \psi^{n_3} + c_4 \psi^{n_4} &=& 0
+c_{0} \, (\psi+x_0)^{n_0} + c_{1} \, (\psi+a_1)^{n_1} &+& \nonumber \\
+c_{2} \, (\psi+a_2)^{n_2} + c_{3} \, (\psi+a_3)^{n_3} + c_{4} \, (\psi+a_4)^{n_4} &=& 0
 \end{eqnarray}
 All the coefficients $c_*$ and the powers $n_*$ can be specified by
 setting the parameters \texttt{*\_gfname[*]} to the desired grid 
