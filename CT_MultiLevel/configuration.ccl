@@ -1,1 +1,1 @@
-REQUIRES Carpet MPI
+REQUIRES Carpet MPI PETSc
