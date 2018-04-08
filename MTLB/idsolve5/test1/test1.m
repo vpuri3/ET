@@ -1,6 +1,4 @@
-function [] = test1()
-
-%% This is for comparison with Two Puncture.
+% This is for comparison with Two Puncture.
 twopc % runs script twopc.m
 
 hsq = h^2;
@@ -26,11 +24,13 @@ residual = zeros(1,it_jacobi+it_linear+1);
 residual (1) = res;
 
 onebysix = 1/6;
-%% Jacobi Iteration on nonlinear PDE.
+% Jacobi Iteration on nonlinear PDE.
 disp('JACOBI ITERATION.')
 count = 1;
 while count <= it_jacobi
-    U(2:n,2:n,2:n) = onebysix*(U(1:n-1,2:n,2:n)+U(3:n+1,2:n,2:n)+U(2:n,1:n-1,2:n)+U(2:n,3:n+1,2:n)+U(2:n,2:n,1:n-1)+U(2:n,2:n,3:n+1)-hsq*R(2:n,2:n,2:n));
+    U(2:n,2:n,2:n) = U(1:n-1,2:n,2:n)+U(3:n+1,2:n,2:n)+U(2:n,1:n-1,2:n)+U(2:n,3:n+1,2:n);
+    U(2:n,2:n,2:n) = +U(2:n,2:n,1:n-1)+U(2:n,2:n,3:n+1)-hsq*R(2:n,2:n,2:n);
+    U(2:n,2:n,2:n) = onebysix;
     res = max(max(max(abs(T-U))));
     residual (count+1) = res;
     iteration (count+1) = count;
@@ -40,6 +40,7 @@ end
 semilogy(iteration(1:it_jacobi+1),residual(1:it_jacobi+1),'--k','LineWidth',1.2,'DisplayName','Jacobi')
 hold on
 
+Omega = 0.5; OneMinusOmega = 1-Omega;
 
 U0 = U;
 disp('Starting with Linearization')
@@ -56,16 +57,16 @@ while count <= it_linear
     m = it_jacobi + count;
     B = zeros(n-1,n-1,n-1);
     Diff = zeros(n-1,n-1,n-1);
-    %%%%%%%%%%%%%%%%%%
+
     B = onebysix*(delU(1:n-1,2:n,2:n)+delU(3:n+1,2:n,2:n)+delU(2:n,1:n-1,2:n)+delU(2:n,3:n+1,2:n)+delU(2:n,2:n,1:n-1)+delU(2:n,2:n,3:n+1)-hsq*Rv(2:n,2:n,2:n));
-    delU(2:n,2:n,2:n) = OneMinusOmega(r)*delU(2:n,2:n,2:n) + Omega(r)*B;
+    delU(2:n,2:n,2:n) = OneMinusOmega*delU(2:n,2:n,2:n) + Omega*B;
     % Compute Residual
     Diff = abs(Tv(2:n,2:n,2:n)-delU(2:n,2:n,2:n));
     res = max(max(max(Diff)));
     residual (m+k) = res;
     iteration (m+k) = m+k; % Iteration Count
     Rv = -0.125*Asq.*(cons1 -7*delU.*cons2) - laplaceU0;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     
     %Plotting
     semilogy(iteration(m:m+k-1),residual(m:m+k-1),'-','Linewidth',1.2,'DisplayName',['SRJ ' num2str(count)])
@@ -82,4 +83,3 @@ ylabel('|| r ||_\infty','Fontsize',15)
 title('Linearized SRJ','Fontsize',15)
 xlim([0,length(iteration)]);
 grid on
-end

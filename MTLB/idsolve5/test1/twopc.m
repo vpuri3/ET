@@ -1,9 +1,9 @@
-%% Section 1
+% Section 1
 n = 50;
 dmsz = 5;
 h = 2*dmsz/n;
-it_linear = 5;
-it_jacobi = 50;
+it_linear = 0;
+it_jacobi = 10e4;
 points = (-1*dmsz):h:dmsz;
 
 disp(['Domain: [' num2str(points(1)) ',' num2str(points(end)) ']^3' ])
@@ -14,7 +14,7 @@ disp(['Linearization Steps: ' num2str(it_linear)])
 %Third index is for z axis.
 
 [X,Y,Z] = ndgrid(points);
-%% suffix 1 --> plus, suffix 2 --> minus
+% suffix 1 --> plus, suffix 2 --> minus
 %syms c p r1 r2
 p = 0.3331917498;
 c = 1.168642873;
@@ -60,7 +60,7 @@ A33 = A33 + -(3*p*Y.*((Z.*Z)./(r2.^2) - 1))./(2*r2.^3) ;
 
 Asq = A11.^2 + A12.^2 + A13.^2 + A21.^2 + A22.^2 + A23.^2 + A31.^2 + A32.^2 + A33.^2; 
 
-%% Stuff
+% Stuff
 %v1 = cross(s1,n1);
 %vv1 = n1'*v1;
 %As1 = (3/(r1^3))*(vv1+vv1');
