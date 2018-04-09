@@ -21,7 +21,7 @@ int main(int argc,char **args)
   PetscErrorCode ierr;
   Vec            x, u, f, d, cxx, cyy, cave, c1, temp;  /*sol, true, rhs, diagonals, coeffs*/
   Mat            A, F;                        /*system matrix Operator, preconditioner matrix*/
-  PetscInt       idx, nx=1e3, ny=1e3, nz=1, N=nx*ny;
+  PetscInt       idx, nx=0.5e3, ny=0.5e3, nz=1, N=nx*ny;
   Ctx            ctx;                         /*data structure to pass information around*/
   KSP            ksp;
   PC             pc;

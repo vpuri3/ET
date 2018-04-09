@@ -27,4 +27,8 @@ fftw2d: fftw2d.o
 	gcc -o fftw2d fftw2d.c -lfftw3 -lm
 	${RM} fftw2d.o
 
+fftw3d: fftw3d.o
+	gcc -o fftw3d fftw3d.c -lfftw3 -lm
+	${RM} fftw3d.o
+
 #include ${PETSC_DIR}/lib/petsc/conf/test
