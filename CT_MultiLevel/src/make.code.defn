@@ -1,0 +1,31 @@
+# Main make.code.defn file for thorn CT_MultiLevel
+
+# Source files in this directory
+SRCS = CT_MultiLevel.cc \
+       CT_V.cc \
+       CT_InitializePsi.cc \
+       CT_InitializeError.cc \
+       CT_InitializeCoefficients.cc \
+       CT_InitializeResidual.cc \
+       CT_InitializeConstants.cc \
+       CT_InitializeAuxiliaries.cc \
+       CT_RelaxPsi.cc \
+       CT_RelaxError.cc \
+       CT_Boundaries.cc \
+       CT_SolvePsiEquation.cc \
+       CT_SolveErrorEquation.cc \
+       CT_AddErrorToPsi.cc \
+       CT_Reset.cc \
+       CT_EnforceInt.cc \
+       CT_OutputWalk.cc \
+       CT_RestoreError.cc \
+       CT_CalcPsiResidual.cc \
+       CT_CalcErrResidual.cc \
+       CT_CompareToExact.cc  \
+       CT_UpdateBoundaries.cc \
+       CT_CopyResidual.cc \
+       CT_PopulatePointerStruct.cc \
+       CT_Utils.cc 
+
+# Subdirectories containing source files
+SUBDIRS = 

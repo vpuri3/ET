@@ -1,0 +1,23 @@
+NPROCS 2
+
+TEST boostedpuncture
+{
+  ABSTOL 1e-13 ham 
+  RELTOL 1e-08 ham
+
+  RELTOL 1e+20 err  # Do not test the relative change in this gridfunction
+}
+
+TEST constraints_spherical
+{
+  ABSTOL 1e-05
+  RELTOL 1e+06
+
+  RELTOL 1e+20 err  # Do not test the relative change in this gridfunction
+}
+
+TEST poisson
+{
+  RELTOL 1e+20 err  # Do not test the relative change in this gridfunction
+  RELTOL 1e-05 residual
+}

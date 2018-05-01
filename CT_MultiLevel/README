@@ -1,0 +1,16 @@
+Cactus Code Thorn CT_MultiLevel
+Author(s)    : Eloisa Bentivegna <eloisa.bentivegna@unict.it>
+Maintainer(s): Eloisa Bentivegna <eloisa.bentivegna@unict.it>
+Copyright    : Eloisa Bentivegna, 2013-2016
+Licence      : GPLv3+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn implements a multigrid solver for systems of elliptic PDEs.
+It uses Carpet to manage the different grids and the transfer of data
+between them. The solver is generic -- the system of equations to solve
+is defined at runtime by setting its coefficients via external grid
+functions. 
+
+Some examples are discussed in gr-qc/1305.5576.

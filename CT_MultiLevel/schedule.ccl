@@ -1,0 +1,16 @@
+#
+
+STORAGE: psi[3]
+STORAGE: residual[3] err[3]
+STORAGE: coeffs[3]
+STORAGE: copies[1]
+STORAGE: cell_integral[1]
+STORAGE: auxiliaries[1]
+STORAGE: rhs[1]
+STORAGE: constants[1]
+
+schedule CT_MultiLevel AT CCTK_INITIAL after CT_ScalarField_setConfRho
+{
+  LANG: C
+  OPTIONS: GLOBAL-LATE
+} "Main MultiLevel function"
