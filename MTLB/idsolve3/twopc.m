@@ -24,10 +24,10 @@ h5disp('gxx.xyz.h5','/ADMBASE::gxx it=0 tl=0 rl=0')
 T = h5read('gxx.xyz.h5','/ADMBASE::gxx it=0 tl=0 rl=0');
 T = T.^0.25;
 
-%% suffix 1 --> plus, suffix 2 --> minus
-syms c p r1 r2
-p = ;
-c = ;
+% suffix 1 --> plus, suffix 2 --> minus
+%syms c p r1 r2
+%p = ;
+%c = ;
 c1 = [c,0,0];
 c2 = -1*c1;
 p1 = [0,p,0];
@@ -40,7 +40,7 @@ r1 = sqrt(Y.^2+Z.^2+(X-c1(1)).^2);
 r2 = sqrt(Y.^2+Z.^2+(X-c2(1)).^2);
 C = 1+(M1./r1)+(M2./r2);
 
-syms x y z
+%syms x y z
 xx = [x,y,z];
 n1 = (xx-c1)/r1;
 n2 = (xx-c2)/r2;
@@ -74,7 +74,7 @@ A33 = A33 + -(3*p*Y.*((Z.*Z)./(r2.^2) - 1))./(2*r2.^3) ;
 
 
 Asq = A11.^2 + A12.^2 + A13.^2 + A21.^2 + A22.^2 + A23.^2 + A31.^2 + A32.^2 + A33.^2; 
-%% SPIN stuff
+% SPIN stuff
 %v1 = cross(s1,n1);
 %vv1 = n1'*v1;
 %As1 = (3/(r1^3))*(vv1+vv1');

@@ -1,4 +1,4 @@
-%% This is for comparison with Two Puncture.
+% This is for comparison with Two Puncture.
 clear
 close all
 twopc % runs script twopc.m
@@ -24,7 +24,7 @@ residual = zeros(1,it_jacobi+it_newton*it_srj+1);
 residual (1) = res;
 
 onebysix = 1/6;
-%% Jacobi Iteration on nonlinear PDE.
+% Jacobi Iteration on nonlinear PDE.
 disp('JACOBI ITERATION.')
 count = 1;
 while count <= it_jacobi
@@ -38,7 +38,7 @@ end
 semilogy(iteration(1:it_jacobi+1),residual(1:it_jacobi+1),'--k','LineWidth',1.2,'DisplayName','Jacobi')
 hold on
 
-%% Linearization and SRJ
+% Linearization and SRJ
 U0 = U;
 M = length(Omega);
 OneMinusOmega = 1 -  Omega;

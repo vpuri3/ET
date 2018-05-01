@@ -6,7 +6,7 @@ n = 64; %Number of grid points per dimension.
 h = 1/n; %Grid spacing
 it_jacobi = 100;
 it_srj = 1000;
-it_linear = 7; % # of linearization steps.
+it_linear = 4; % # of linearization steps.
 
 N_ef = 0.5*pi/(asin(sqrt((2/3)*(sin(pi/(2*n)))^2)))  % Dirichlet Boundary Conditions
 
@@ -54,7 +54,7 @@ end
 
 
 %% Plotting
-semilogy(iteration(1:it_jacobi+1),residual(1:it_jacobi+1),'--k','LineWidth',1.2,'DisplayName','Jacobi')
+semilogy(iteration(1:it_jacobi+1),residual(1:it_jacobi+1),'--k','LineWidth',2,'DisplayName','Jacobi')
 hold on
 
 V0 = A;
@@ -100,7 +100,7 @@ while count <= it_linear
     end
     
     %Plotting
-    semilogy(iteration(m:m+k-1),residual(m:m+k-1),'-','Linewidth',1.2,'DisplayName',['SRJ ' num2str(count)])
+    semilogy(iteration(m:m+k-1),residual(m:m+k-1),'-','Linewidth',2,'DisplayName',['SRJ ' num2str(count)])
     
     V0 = V0 + deltaV;
     count = count+1;

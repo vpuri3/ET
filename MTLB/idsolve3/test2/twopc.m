@@ -3,8 +3,8 @@ Omega = P6_64;
 n = 100;
 dmsz = 5;
 h = 2*dmsz/n;
-it_jacobi = 0;
-it_srj = 1000;
+it_jacobi = 100;
+it_srj = length(Omega);
 it_newton = 4;
 points = (-1*dmsz):h:dmsz;
 N_ef = 0.5*pi/(asin(sqrt((2/3)*(sin(pi/(2*n)))^2))); % Dirichlet Boundary Conditions;
@@ -19,7 +19,7 @@ disp(['Effective number of SRJ points: ' num2str(N_ef)])
 %Third index is for z axis.
 
 [X,Y,Z] = ndgrid(points);
-%% Getting Bowen York Curvature.
+% Getting Bowen York Curvature.
 % 1,2,3 --> x,y,z respectively
 c = 1.168642873; % position of black holes
 p = [0, 0.3331917498, 0];
